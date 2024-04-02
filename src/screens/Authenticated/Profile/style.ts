@@ -22,11 +22,11 @@ const styles = StyleSheet.create({
     },
     socialPanel: {
         flexDirection: 'row',
-        justifyContent: 'space-around',
+        justifyContent: 'space-evenly',
         marginTop: 20,
     },
     socialPanelItem: {
-        backgroundColor: Colors.TEXT_LITE_GRAY,
+        backgroundColor: Colors.SOCIAL_BUTTON,
         padding: 10,
         borderRadius: 100,
         backfaceVisibility: 'hidden',

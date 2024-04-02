@@ -9,6 +9,7 @@ import AppBackground from '../../../components/view/AppBackground'
 import Icon from 'react-native-vector-icons/Ionicons'
 import { AuthenticatedNavigatorType } from '../../../routes/Authenticated'
 import database from '@react-native-firebase/database'
+import CustomLoader from '../../../components/view/CustomLoader'
 
 interface HomeProps {
   navigation: NativeStackNavigationProp<AuthenticatedNavigatorType>
@@ -29,8 +30,10 @@ const Home = ({ navigation }: HomeProps) => {
   const dispatch = useDispatch()
   const user = useSelector((state: any) => state.userReducer.userInfo);
   const [chatData, setChatData] = useState<ChatUserData[]>([]);
+  const [loader, setLoader] = useState<boolean>(false);
 
   useEffect(() => {
+    setLoader(true);
     try {
       const userRef = database().ref(`users/${user.uuid}/conversation`);
 
@@ -48,10 +51,12 @@ const Home = ({ navigation }: HomeProps) => {
           } else {
             console.log('Data is null');
           }
+          setLoader(false);
         })
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log('error', error);
+      setLoader(false);
     }
   }, []);
 
@@ -100,6 +105,12 @@ const Home = ({ navigation }: HomeProps) => {
 
   return (
     <AppBackground>
+
+      <CustomLoader
+        loader={loader}
+        setLoader={setLoader}
+      />
+
       <View style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity style={styles.searchIcon} onPress={() => navigation.navigate(Routes.SearchUser)}>

@@ -8,6 +8,7 @@ import { Colors, String } from '../../../utils';
 import database from '@react-native-firebase/database';
 import styles from './style';
 import { AuthenticatedNavigatorType } from '../../../routes/Authenticated';
+import CustomLoader from '../../../components/view/CustomLoader';
 
 type ConversationType = NativeStackScreenProps<AuthenticatedNavigatorType, 'Conversation'>;
 
@@ -26,6 +27,7 @@ const Conversation = ({ navigation, route }: ConversationType) => {
   const [input, setInput] = useState<string>('');
   const [conversations, setConversations] = useState<ConversationMessage[]>([]);
   const [day, setDay] = useState<string>(String.today);
+  const [loader, setLoader] = useState<boolean>(false);
 
   useEffect(() => {
     fetchConversations();
@@ -46,7 +48,9 @@ const Conversation = ({ navigation, route }: ConversationType) => {
           const messages: ConversationMessage[] = [];
 
           for (let key in snapshotData) {
-            messages.push(snapshotData[key]);
+            const message = snapshotData[key];
+            const day = getDay(message.timestamp);
+            messages.push({ ...message, day });
           }
           setConversations(messages);
         });
@@ -108,18 +112,28 @@ const Conversation = ({ navigation, route }: ConversationType) => {
       ]);
 
       setInput('');
+      fetchConversations();
     } catch (error: any) {
       console.log('Error sending message:', error);
     }
   };
 
-  const getDay = () => {
-    console.log('get day')
+  const getDay = (timestamp: string) => {
+    const today = moment().format('YYYY-MM-DD');
+    const messageDate = moment(timestamp).format('YYYY-MM-DD');
+    const yesterday = moment().subtract(1, 'days').format('YYYY-MM-DD');
+
+    if (today === messageDate) {
+      setDay(String.today);
+    } else if (yesterday === messageDate) {
+      setDay(String.yesterday);
+    } else {
+      setDay(moment(timestamp).format('MMM DD, YYYY'));
+    }
   }
 
   const renderChatBubble = ({ item }: { item: ConversationMessage }) => {
     const isSender = item.senderId === user.uuid;
-    // getDay(item.timestamp);
     return (
       <View style={[styles.messageContainer, { alignSelf: isSender ? 'flex-end' : 'flex-start' }]}>
         {!isSender && <Image source={item.receiverProfilePicture ? { uri: item.receiverProfilePicture } : require('../../../assets/Images/user.jpg')} style={styles.userImage} />}
@@ -133,7 +147,6 @@ const Conversation = ({ navigation, route }: ConversationType) => {
       </View>
     );
   };
-  
 
   return (
     <View style={styles.container}>

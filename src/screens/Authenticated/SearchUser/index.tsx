@@ -28,27 +28,32 @@ const SearchUser = ({ navigation }: SearchUserProps) => {
 
   useEffect(() => {
     filterUsers();
-  }, [input])
+  }, [input, userdata])
 
   const fetchUsers = () => {
     setLoader(true);
     try {
-      database()
-        .ref('users')
-        .on('value', snapshot => {
-          const users = snapshot.val();
-          delete users[userId];
-          const data = [];
-          for (let id in users) {
-            data.push(users[id]);
-          }
-          setUserData(data);
-          setLoader(false);
-        });
+      database().ref('users').on('value', snapshot => {
+        const users = snapshot.val();
+        delete users[userId];
+        const data = [];
+        for (let id in users) {
+          data.push(users[id]);
+        }
+        setUserData(data);
+        setLoader(false);
+      });
     } catch (error) {
       console.log(error);
     }
   };
+
+  const filterUsers = () => {
+    const filtered = userdata.filter((user) => {
+      return user.userName?.toLowerCase().includes(input.toLowerCase());
+    });
+    setFilteredUsers(filtered);
+  }
 
   const renderDetailed = ({ item }: any) => {
     return (
@@ -62,13 +67,6 @@ const SearchUser = ({ navigation }: SearchUserProps) => {
         </View>
       </TouchableOpacity>
     )
-  }
-
-  const filterUsers = () => {
-    const filtered = userdata.filter((user) => {
-      return user.userName?.toLowerCase().includes(input.toLowerCase());
-    });
-    setFilteredUsers(filtered);
   }
 
   return (
@@ -87,7 +85,7 @@ const SearchUser = ({ navigation }: SearchUserProps) => {
       </View>
 
       <FlatList
-        data={userdata}
+        data={filteredUsers}
         keyExtractor={(item, index) => index.toString()}
         renderItem={renderDetailed}
       />

@@ -15,5 +15,5 @@ export const Colors = {
     MODAL_BACKGROUND: 'rgba(0, 0, 0, 0.5)',
     NOTIFICATION_RIPPLE: '#F04A4C',
     INPUT_FIELD: '#F3F6F6',
-    CHAT_BUBBLE:'#3D4A7A',
+    CHAT_BUBBLE: '#3D4A7A',
 } as const;
