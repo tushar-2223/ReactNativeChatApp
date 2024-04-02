@@ -36,18 +36,18 @@ const Home = ({ navigation }: HomeProps) => {
   const user = useSelector((state: any) => state.userReducer.userInfo);
   const [chatData, setChatData] = useState<ChatUserData[]>([]);
 
+  console.log('chatData', chatData)
+
   useEffect(() => {
     try {
       const userRef = database().ref(`users/${user.uuid}/conversation`);
       userRef.on('value', (snapshot) => {
         const data = snapshot.val();
-        const chatData: ChatUserData[] = [];
 
-        for (const key in data) {
-          const chatUser = data[key];
-          chatData.push(chatUser);
-        }
-        setChatData(chatData);
+        const chatData = Object.keys(data).map(key => {
+          return { ...data[key], receiverId: key }
+        })
+        setChatData(chatData)
       })
     } catch (error: any) {
       console.log('error', error)
@@ -116,6 +116,14 @@ const Home = ({ navigation }: HomeProps) => {
     }
   }
 
+  const emptyContainer = () => {
+    return (
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyText}>{String.noChat}</Text>
+      </View>
+    )
+  }
+
   return (
     <AppBackground>
       <View style={styles.container}>
@@ -150,6 +158,7 @@ const Home = ({ navigation }: HomeProps) => {
             data={chatData}
             keyExtractor={(item, index) => index.toString()}
             renderItem={renderChatItems}
+            ListEmptyComponent={emptyContainer}
           />
         </View>
       </View>

@@ -22,6 +22,7 @@ export const String = {
     searchUser: 'Search user',
     activeNow: 'Active now',
     you: 'You',
+    noChat: 'No chat found',
 
     logInSuccess: 'Log in successfully',
     emailRequired: 'Email is required',

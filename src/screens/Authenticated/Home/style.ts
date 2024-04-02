@@ -121,6 +121,16 @@ const styles = StyleSheet.create({
         fontFamily: Fonts.black,
         fontSize: FontSize.fontSmall,
     },
+    emptyContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    emptyText: {
+        color: Colors.TEXT_LITE_GRAY,
+        fontFamily: Fonts.regular,
+        fontSize: FontSize.fontXLarge,
+    }
 
 })
 
