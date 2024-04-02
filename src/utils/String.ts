@@ -1,6 +1,6 @@
 export const String = {
     appTitle: 'Textit',
-    welcomeTitle: 'Connect friends easily & quickly',
+    welcomeTitle: 'Connect mates easily & quickly',
     welcomeSubText: 'Our chat app is the perfect way to stay connected with friends and family.',
     or: 'OR',
     signupTitle: 'Sign up with mail',
@@ -23,6 +23,10 @@ export const String = {
     activeNow: 'Active now',
     you: 'You',
     noChat: 'No chat found',
+    today: 'Today',
+    yesterday: 'Yesterday',
+    displayname: 'Display name',
+    emailAddress: 'Email address',
 
     logInSuccess: 'Log in successfully',
     emailRequired: 'Email is required',

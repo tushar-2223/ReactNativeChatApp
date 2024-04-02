@@ -35,9 +35,7 @@ const CustomButton = (props: Props) => {
         colors={gradient}
         start={{ x: 0, y: 0.5 }}
         end={{ x: 1, y: 0.5 }}
-        style={[styles.button
-          , { marginBottom: mb, marginTop: mt }
-        ]}
+        style={[styles.button,{ marginBottom: mb, marginTop: mt }]}
       >
         <Text style={[styles.text, { color: textColor, fontFamily: fontFamily }]}>{title}</Text>
       </LinearGradient>

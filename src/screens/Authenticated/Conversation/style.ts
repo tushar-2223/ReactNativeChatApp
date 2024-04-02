@@ -45,6 +45,8 @@ const styles = StyleSheet.create({
     messageContainer: {
         marginVertical: 7,
         justifyContent: 'center',
+        flexDirection: 'row',
+        gap: 10,
     },
     senderName: {
         fontSize: FontSize.fontSmall,
@@ -96,6 +98,14 @@ const styles = StyleSheet.create({
     headerRight: {
         flexDirection: 'row',
         gap: 15,
+    },
+    chatHeader: {
+        fontSize: FontSize.fontSmall,
+        color: Colors.TEXT_LITE_GRAY,
+        fontFamily: Fonts.medium,
+        opacity: 0.7,
+        marginBottom: height * 0.01,
+        textAlign: 'center',
     },
 })
 

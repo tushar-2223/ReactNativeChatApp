@@ -1,4 +1,4 @@
-import { View, Text, Button } from 'react-native'
+import { View, Text, Button, TouchableOpacity, Image } from 'react-native'
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
@@ -11,6 +11,10 @@ import { Routes } from '../../../routes/Routes';
 import Toast from 'react-native-toast-message';
 import styles from './style';
 import AppBackground from '../../../components/view/AppBackground';
+import Icon from 'react-native-vector-icons/Ionicons';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import { Colors, String } from '../../../utils';
+import CustomButton from '../../../components/ui/CustomButton';
 
 interface ProfileProps {
   navigation: NativeStackNavigationProp<AuthenticatedNavigatorType>;
@@ -48,13 +52,57 @@ const Profile = ({ navigation }: ProfileProps) => {
     }
   }
 
+  const socialPanel = () => (
+    <View style={styles.socialPanel}>
+      <View style={styles.socialPanelItem}>
+        <AntDesign name="message1" size={24} color={Colors.PRIMARY} />
+      </View>
+      <View style={styles.socialPanelItem}>
+        <Icon name="videocam-outline" size={25} color={Colors.PRIMARY} />
+      </View>
+      <View style={styles.socialPanelItem}>
+        <Icon name="call-outline" size={25} color={Colors.PRIMARY} />
+      </View>
+      <View style={styles.socialPanelItem}>
+        <Icon name="ellipsis-horizontal-sharp" size={25} color={Colors.PRIMARY} />
+      </View>
+    </View>
+  )
+
   return (
     <AppBackground>
-      <Text>Profile</Text>
-      <Text>{user?.email}</Text>
-      <Text>{user?.userName}</Text>
-      <Text>{user?.provider}</Text>
-      <Button title="Logout" onPress={handleLogout} />
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Icon name="arrow-back" size={24} color={Colors.PRIMARY} />
+        </TouchableOpacity>
+
+        <View style={styles.userDetailed}>
+          <Image source={
+            user?.provider === 'Google' ? { uri: user?.profilePicture } : require('../../../assets/Images/user.jpg')
+          } style={styles.profilePicture} />
+          <Text style={styles.userName}>{user?.userName}</Text>
+        </View>
+        {socialPanel()}
+      </View>
+
+      <View style={styles.container}>
+        <View style={styles.textDetailItem}>
+          <Text style={styles.textLable}>{String.displayname}</Text>
+          <Text style={styles.textDetail}>{user?.userName}</Text>
+        </View>
+        <View style={styles.textDetailItem}>
+          <Text style={styles.textLable}>{String.emailAddress}</Text>
+          <Text style={styles.textDetail}>{user?.email}</Text>
+        </View>
+        <View style={styles.buttonContainer}>
+          <CustomButton
+            title="Logout"
+            onPress={handleLogout}
+            gradient={[Colors.ERROR_TEXT, Colors.ERROR_TEXT]}
+            mt={20}
+          />
+        </View>
+      </View>
     </AppBackground>
   )
 }

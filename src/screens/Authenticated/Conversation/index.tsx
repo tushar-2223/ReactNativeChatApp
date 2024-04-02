@@ -25,6 +25,7 @@ const Conversation = ({ navigation, route }: ConversationType) => {
   const user = useSelector((state: any) => state.userReducer.userInfo);
   const [input, setInput] = useState<string>('');
   const [conversations, setConversations] = useState<ConversationMessage[]>([]);
+  const [day, setDay] = useState<string>(String.today);
 
   useEffect(() => {
     fetchConversations();
@@ -38,7 +39,7 @@ const Conversation = ({ navigation, route }: ConversationType) => {
 
       if (receiverSnapshot.exists() && senderSnapshot.exists()) {
         const conversationKey = receiverSnapshot.val().conversationKey;
-        const conversationRef = database().ref(`conversations/${conversationKey}`);
+        const conversationRef = database().ref(`conversations/${conversationKey}`).orderByChild('timestamp');
 
         conversationRef.on('value', (snapshot) => {
           const snapshotData = snapshot.val();
@@ -76,7 +77,7 @@ const Conversation = ({ navigation, route }: ConversationType) => {
       const senderRef = database().ref(`users/${user.uuid}/conversation/${id}`);
       const [receiverSnapshot, senderSnapshot] = await Promise.all([receiverRef.once('value'), senderRef.once('value')]);
 
-      let conversationKey:any = '';
+      let conversationKey: any = '';
 
       if (!receiverSnapshot.exists() || !senderSnapshot.exists()) {
         conversationKey = database().ref('conversations').push().key;
@@ -112,18 +113,27 @@ const Conversation = ({ navigation, route }: ConversationType) => {
     }
   };
 
+  const getDay = () => {
+    console.log('get day')
+  }
+
   const renderChatBubble = ({ item }: { item: ConversationMessage }) => {
     const isSender = item.senderId === user.uuid;
+    // getDay(item.timestamp);
     return (
       <View style={[styles.messageContainer, { alignSelf: isSender ? 'flex-end' : 'flex-start' }]}>
-        <Text style={styles.senderName}>{isSender ? String.you : item.receiverName}</Text>
-        <View style={[styles.chatBubble, { borderTopStartRadius: isSender ? 15 : 0, borderTopEndRadius: isSender ? 0 : 15 }]}>
-          <Text style={styles.message}>{item.content}</Text>
+        {!isSender && <Image source={item.receiverProfilePicture ? { uri: item.receiverProfilePicture } : require('../../../assets/Images/user.jpg')} style={styles.userImage} />}
+        <View>
+          <Text style={styles.senderName}>{isSender ? String.you : item.receiverName}</Text>
+          <View style={[styles.chatBubble, { borderTopStartRadius: isSender ? 15 : 0, borderTopEndRadius: isSender ? 0 : 15 }]}>
+            <Text style={styles.message}>{item.content}</Text>
+          </View>
+          <Text style={styles.timestamp}>{moment(item.timestamp).format('hh:mm A')}</Text>
         </View>
-        <Text style={styles.timestamp}>{moment(item.timestamp).format('hh:mm A')}</Text>
       </View>
     );
   };
+  
 
   return (
     <View style={styles.container}>
@@ -143,11 +153,13 @@ const Conversation = ({ navigation, route }: ConversationType) => {
       </View>
 
       <View style={styles.chatContainer}>
+        <Text style={styles.chatHeader}>{day}</Text>
         <FlatList
           data={conversations}
           keyExtractor={(item, index) => index.toString()}
           showsVerticalScrollIndicator={false}
           renderItem={renderChatBubble}
+          inverted
         />
       </View>
 
@@ -171,4 +183,3 @@ const Conversation = ({ navigation, route }: ConversationType) => {
 };
 
 export default Conversation;
-

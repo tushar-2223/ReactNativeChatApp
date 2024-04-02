@@ -1,15 +1,9 @@
 import { View, Text, Image, FlatList, TouchableOpacity, Button } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import styles from './style'
-import auth from '@react-native-firebase/auth'
 import { Routes } from '../../../routes/Routes'
 import { useDispatch, useSelector } from 'react-redux'
-import { logOut } from '../../../redux-toolkit/userSlice'
-import { CommonActions } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { RootNavigatorType } from '../../../routes/Navigate'
-import { GoogleSignin } from '@react-native-google-signin/google-signin'
-import Toast from 'react-native-toast-message'
 import { Colors, String, minAgo, storyData } from '../../../utils'
 import AppBackground from '../../../components/view/AppBackground'
 import Icon from 'react-native-vector-icons/Ionicons'
@@ -39,18 +33,27 @@ const Home = ({ navigation }: HomeProps) => {
   useEffect(() => {
     try {
       const userRef = database().ref(`users/${user.uuid}/conversation`);
-      userRef.on('value', (snapshot) => {
-        const data = snapshot.val();
 
-        const chatData = Object.keys(data).map(key => {
-          return { ...data[key], receiverId: key }
+      if (!userRef) {
+        console.log('No user found')
+      } else {
+        userRef.on('value', (snapshot) => {
+          const data = snapshot.val();
+
+          if (data) {
+            const chatData = Object.keys(data).map(key => {
+              return { ...data[key], receiverId: key }
+            });
+            setChatData(chatData);
+          } else {
+            console.log('Data is null');
+          }
         })
-        setChatData(chatData)
-      })
-    } catch (error: any) {
-      console.log('error', error)
+      }
+    } catch (error) {
+      console.log('error', error);
     }
-  }, [])
+  }, []);
 
   const renderStoryItems = ({ item }: any) => {
     return (
@@ -85,33 +88,6 @@ const Home = ({ navigation }: HomeProps) => {
         </View>
       </TouchableOpacity>
     )
-  }
-
-  const handleLogout = async () => {
-    try {
-      if (user?.provider === 'Google') {
-        await GoogleSignin.signOut();
-      }
-      await auth().signOut()
-      dispatch(logOut())
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{ name: Routes.UnAuthenticated }],
-        })
-      )
-      Toast.show({
-        type: 'success',
-        text1: 'Success',
-        text2: 'Logged out successfully',
-      })
-    } catch (error: any) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: error.message,
-      })
-    }
   }
 
   const emptyContainer = () => {
