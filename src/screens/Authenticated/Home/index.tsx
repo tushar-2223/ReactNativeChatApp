@@ -10,7 +10,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { RootNavigatorType } from '../../../routes/Navigate'
 import { GoogleSignin } from '@react-native-google-signin/google-signin'
 import Toast from 'react-native-toast-message'
-import { Colors, String, storyData } from '../../../utils'
+import { Colors, String, minAgo, storyData } from '../../../utils'
 import AppBackground from '../../../components/view/AppBackground'
 import Icon from 'react-native-vector-icons/Ionicons'
 import { AuthenticatedNavigatorType } from '../../../routes/Authenticated'
@@ -35,8 +35,6 @@ const Home = ({ navigation }: HomeProps) => {
   const dispatch = useDispatch()
   const user = useSelector((state: any) => state.userReducer.userInfo);
   const [chatData, setChatData] = useState<ChatUserData[]>([]);
-
-  console.log('chatData', chatData)
 
   useEffect(() => {
     try {
@@ -80,7 +78,7 @@ const Home = ({ navigation }: HomeProps) => {
           <Text style={styles.lastChat}>{item.content}</Text>
         </View>
         <View style={styles.chatTimeContainer}>
-          <Text style={styles.chatTime}>2 min ago</Text>
+          <Text style={styles.chatTime}>{minAgo(item.timestamp)}</Text>
           <View style={styles.chatNotification}>
             <Text style={styles.notificationText}>2</Text>
           </View>
