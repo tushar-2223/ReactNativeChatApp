@@ -1,4 +1,4 @@
-import { View, Text, Image, FlatList, TouchableOpacity, Button } from 'react-native'
+import { View, Text, Image, FlatList, TouchableOpacity, Button, BackHandler } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import styles from './style'
 import { Routes } from '../../../routes/Routes'
@@ -10,6 +10,9 @@ import Icon from 'react-native-vector-icons/Ionicons'
 import { AuthenticatedNavigatorType } from '../../../routes/Authenticated'
 import database from '@react-native-firebase/database'
 import CustomLoader from '../../../components/view/CustomLoader'
+import CustomModal from '../../../components/view/CustomModal'
+import { ModalType } from '../../../components/view/CustomModal'
+import { useIsFocused } from '@react-navigation/native'
 
 interface HomeProps {
   navigation: NativeStackNavigationProp<AuthenticatedNavigatorType>
@@ -29,6 +32,28 @@ const Home = ({ navigation }: HomeProps) => {
   const user = useSelector((state: any) => state.userReducer.userInfo);
   const [chatData, setChatData] = useState<Record<string, ChatUserData[]>>({});
   const [loader, setLoader] = useState<boolean>(false);
+  const [modal, setModal] = useState<boolean>(false);
+  const [title, setTitle] = useState<string>('');
+  const [message, setMessage] = useState<string>('');
+  const [modalType, setModalType] = useState<ModalType>(ModalType.ALERT);
+  const isFocusedScreen = useIsFocused();
+
+  useEffect(() => {
+    const backAction = () => {
+      openModal(String.alert, ModalType.BACKHANDLER, String.backActionMessage)
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (isFocusedScreen) {
+        return backAction();
+      }
+      return false;
+    });
+
+    return () => backHandler.remove();
+  }, [isFocusedScreen]);
+
 
   useEffect(() => {
     setLoader(true);
@@ -113,11 +138,29 @@ const Home = ({ navigation }: HomeProps) => {
     )
   }
 
+  const openModal = (title: string, type: ModalType, message: string) => {
+    setModal(true)
+    setTitle(title)
+    setModalType(type)
+    setMessage(message)
+  }
+
   return (
     <AppBackground>
       <CustomLoader
         loader={loader}
         setLoader={setLoader}
+      />
+      <CustomModal
+        modal={modal}
+        setModal={setModal}
+        type={modalType}
+        title={title}
+        message={message}
+        button1Text={String.ok}
+        button1Action={() => BackHandler.exitApp()}
+        button2Text={String.cancel}
+        button2Action={() => setModal(false)}
       />
 
       <View style={styles.container}>

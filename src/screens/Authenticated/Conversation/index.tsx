@@ -35,7 +35,7 @@ const Conversation = ({ navigation, route }: ConversationType) => {
       const snapshot = await database().ref(`users/${id}`).once('value');
       setReceiverData(snapshot.val());
     } catch (error) {
-      console.log('Error fetching receiver data:', error);
+      console.log('Error fetching while receiver data:', error);
     }
   };
 
@@ -75,7 +75,6 @@ const Conversation = ({ navigation, route }: ConversationType) => {
       console.log('Error fetching conversations:', error);
     }
   };
-
 
   const sendMessage = async () => {
     try {

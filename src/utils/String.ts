@@ -30,6 +30,9 @@ export const String = {
     createGroup: 'Create group',
     dataNull: 'Data not found',
     typeMessage: 'Type a message',
+    ok: 'Ok',
+    cancel: 'Cancel',
+    logout: 'Logout',
 
     logInSuccess: 'Log in successfully',
     emailRequired: 'Email is required',
@@ -57,4 +60,13 @@ export const String = {
     //provider
     google: 'Google',
     emailPassword: 'EmailPassword',
+
+    //modal type and message
+    alert: 'Alert',
+    info: 'Info',
+    backHandler: 'BackHandler',
+    Ssuccess: 'Success',
+    error: 'Error',
+    backActionMessage: 'Are you sure you want to exit the app?',
+    logoutMessage: 'Are you sure you want to logout?',
 } as const;

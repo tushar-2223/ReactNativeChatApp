@@ -1,5 +1,5 @@
 import { View, Text, Button, TouchableOpacity, Image } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
@@ -15,6 +15,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { Colors, String } from '../../../utils';
 import CustomButton from '../../../components/ui/CustomButton';
+import CustomModal, { ModalType } from '../../../components/view/CustomModal';
 
 interface ProfileProps {
   navigation: NativeStackNavigationProp<AuthenticatedNavigatorType>;
@@ -24,6 +25,17 @@ const Profile = ({ navigation }: ProfileProps) => {
 
   const user = useSelector((state: any) => state.userReducer.userInfo);
   const dispatch = useDispatch();
+  const [modal, setModal] = useState<boolean>(false);
+  const [title, setTitle] = useState<string>('');
+  const [message, setMessage] = useState<string>('');
+  const [modalType, setModalType] = useState<ModalType>(ModalType.ALERT);
+
+  const openModal = (title: string, type: ModalType, message: string) => {
+    setModal(true)
+    setTitle(title)
+    setModalType(type)
+    setMessage(message)
+  }
 
   const handleLogout = async () => {
     try {
@@ -71,6 +83,19 @@ const Profile = ({ navigation }: ProfileProps) => {
 
   return (
     <AppBackground>
+
+      <CustomModal
+        modal={modal}
+        setModal={setModal}
+        type={modalType}
+        title={title}
+        message={message}
+        button1Text={String.ok}
+        button1Action={() => handleLogout()}
+        button2Text={String.cancel}
+        button2Action={() => setModal(false)}
+      />
+
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Icon name="arrow-back" size={24} color={Colors.PRIMARY} />
@@ -97,7 +122,7 @@ const Profile = ({ navigation }: ProfileProps) => {
         <View style={styles.buttonContainer}>
           <CustomButton
             title="Logout"
-            onPress={handleLogout}
+            onPress={() => openModal(String.logout, ModalType.ALERT, String.logoutMessage)}
             gradient={[Colors.ERROR_TEXT, Colors.ERROR_TEXT]}
             mt={20}
           />
