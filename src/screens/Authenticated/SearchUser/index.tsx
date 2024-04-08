@@ -10,6 +10,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { AuthenticatedNavigatorType } from '../../../routes/Authenticated'
 import { Routes } from '../../../routes/Routes'
 import { useSelector } from 'react-redux'
+import AntDesign from 'react-native-vector-icons/AntDesign'
 
 interface SearchUserProps {
   navigation: NativeStackNavigationProp<AuthenticatedNavigatorType>
@@ -58,7 +59,7 @@ const SearchUser = ({ navigation }: SearchUserProps) => {
   const renderDetailed = ({ item }: any) => {
     return (
       <TouchableOpacity style={styles.userContainer} onPress={
-        () => navigation.navigate(Routes.Conversation, { id: item.uuid, userName: item.userName, profilePicture: item.profilePicture })
+        () => navigation.navigate(Routes.Conversation, { id: item.uuid })
       }>
         <Image source={item.profilePicture ? { uri: item.profilePicture } : require('../../../assets/Images/user.jpg')} style={styles.userImage} />
         <View style={styles.userInfo}>
@@ -72,16 +73,21 @@ const SearchUser = ({ navigation }: SearchUserProps) => {
   return (
     <View style={styles.container}>
       <CustomLoader loader={loader} setLoader={setLoader} />
-      <View style={styles.inputField}>
-        <Icon name="search-outline" size={25} color={Colors.DARK} />
-        <TextInput
-          style={styles.input}
-          placeholder={String.searchUser}
-          placeholderTextColor={Colors.TEXT_LITE_GRAY}
-          value={input}
-          onChangeText={(text) => setInput(text)}
+      <View style={styles.headerContainer}>
+        <View style={styles.inputField}>
+          <Icon name="search-outline" size={25} color={Colors.DARK} />
+          <TextInput
+            style={styles.input}
+            placeholder={String.searchUser}
+            placeholderTextColor={Colors.TEXT_LITE_GRAY}
+            value={input}
+            onChangeText={(text) => setInput(text)}
+          />
+          <Icon name="close-outline" size={25} color={Colors.DARK} onPress={() => setInput('')} />
+        </View>
+        <AntDesign name="pluscircleo" size={25} color={Colors.DARK}
+          onPress={() => navigation.navigate(Routes.Creategroup)}
         />
-        <Icon name="close-outline" size={25} color={Colors.DARK} onPress={() => setInput('')} />
       </View>
 
       <FlatList

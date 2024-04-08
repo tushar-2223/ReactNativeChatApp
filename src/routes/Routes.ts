@@ -10,4 +10,5 @@ export const Routes = {
     SearchUser: 'SearchUser',
     Profile: 'Profile',
     Conversation: 'Conversation',
+    Creategroup: 'Creategroup',
 } as const;

@@ -2,7 +2,7 @@ import { View, Text, Image, FlatList, TouchableOpacity, Button } from 'react-nat
 import React, { useEffect, useState } from 'react'
 import styles from './style'
 import { Routes } from '../../../routes/Routes'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Colors, String, minAgo, storyData } from '../../../utils'
 import AppBackground from '../../../components/view/AppBackground'
@@ -18,18 +18,16 @@ interface HomeProps {
 interface ChatUserData {
   content: string;
   ConversationKey: string;
-  profilePicture?: string;
-  senderName?: string;
-  senderId?: string;
   timestamp: string;
-  receiverId?: string;
+  receiverId: string;
+  receiverName: string;
+  receiverProfilePicture: string;
 }
 
 const Home = ({ navigation }: HomeProps) => {
 
-  const dispatch = useDispatch()
   const user = useSelector((state: any) => state.userReducer.userInfo);
-  const [chatData, setChatData] = useState<ChatUserData[]>([]);
+  const [chatData, setChatData] = useState<Record<string, ChatUserData[]>>({});
   const [loader, setLoader] = useState<boolean>(false);
 
   useEffect(() => {
@@ -38,21 +36,32 @@ const Home = ({ navigation }: HomeProps) => {
       const userRef = database().ref(`users/${user.uuid}/conversation`);
 
       if (!userRef) {
-        console.log('No user found')
+        console.log(String.noChat)
       } else {
         userRef.on('value', (snapshot) => {
           const data = snapshot.val();
+          const chatData: any = [];
 
           if (data) {
-            const chatData = Object.keys(data).map(key => {
-              return { ...data[key], receiverId: key }
-            });
+            for (let key in data) {
+              const chat = data[key];
+              chatData.push({
+                content: chat.content,
+                ConversationKey: chat.ConversationKey,
+                timestamp: chat.timestamp,
+                receiverId: chat.receiverId,
+                receiverName: chat.userName,
+                receiverProfilePicture: chat.profilePicture
+              });
+            }
+            chatData.sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
             setChatData(chatData);
           } else {
-            console.log('Data is null');
+            console.log(String.dataNull);
           }
           setLoader(false);
-        })
+        }
+        )
       }
     } catch (error: any) {
       console.log('error', error);
@@ -77,8 +86,9 @@ const Home = ({ navigation }: HomeProps) => {
   const renderChatItems = ({ item }: any) => {
     return (
       <TouchableOpacity style={styles.chatContainerBox} onPress={
-        () => navigation.navigate(Routes.Conversation, { id: item.receiverId, userName: item?.receiverName, profilePicture: item.receiverProfilePicture })
-      }>
+        () => navigation.navigate(Routes.Conversation, { id: item.receiverId })
+      }
+      >
         <Image source={item.receiverProfilePicture ? { uri: item.receiverProfilePicture } : require('../../../assets/Images/user.jpg')
         } style={styles.chatUserImage} />
         <View style={styles.userDetailed}>
@@ -105,7 +115,6 @@ const Home = ({ navigation }: HomeProps) => {
 
   return (
     <AppBackground>
-
       <CustomLoader
         loader={loader}
         setLoader={setLoader}
@@ -117,7 +126,7 @@ const Home = ({ navigation }: HomeProps) => {
             <Icon name="search-outline" size={25} color={Colors.PRIMARY} />
           </TouchableOpacity>
           <Text style={styles.headerText}>{String.home}</Text>
-          <TouchableOpacity style={styles.userIcon} onPress={() => navigation.navigate(Routes.Profile)}>
+          <TouchableOpacity onPress={() => navigation.navigate(Routes.Profile)}>
             <Image
               source={user?.profilePicture ? { uri: user.profilePicture } : require('../../../assets/Images/user.jpg')}
               style={styles.profilePicture}
@@ -135,12 +144,11 @@ const Home = ({ navigation }: HomeProps) => {
           />
         </View>
 
-        {/* chat container */}
         <View style={styles.chatContainer}>
           <View style={styles.topBar} />
 
           <FlatList
-            data={chatData}
+            data={Object.values(chatData)}
             keyExtractor={(item, index) => index.toString()}
             renderItem={renderChatItems}
             ListEmptyComponent={emptyContainer}

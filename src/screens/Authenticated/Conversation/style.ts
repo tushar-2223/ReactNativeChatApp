@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { Colors, String, Fonts, height, FontSize } from "../../../utils";
+import { Colors, String, Fonts, height, FontSize, width } from "../../../utils";
 
 const styles = StyleSheet.create({
     container: {
@@ -78,14 +78,19 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 10,
     },
-    input: {
+    inputField: {
         flex: 1,
+        flexDirection: 'row',
         backgroundColor: Colors.INPUT_FIELD,
         borderRadius: 10,
         paddingHorizontal: 10,
+        alignItems: 'center',
+    },
+    input: {
+        flex: 1,
         fontFamily: Fonts.regular,
         fontSize: FontSize.fontSmall,
-        color:Colors.DARK,
+        color: Colors.DARK,
     },
     sendButton: {
         padding: 11,
@@ -93,7 +98,7 @@ const styles = StyleSheet.create({
         marginLeft: 10,
     },
     attachIcon: {
-        transform: [{ rotate: '35deg' }],
+        transform: [{ rotate: '45deg' }],
     },
     headerRight: {
         flexDirection: 'row',
@@ -107,6 +112,19 @@ const styles = StyleSheet.create({
         marginBottom: height * 0.01,
         textAlign: 'center',
     },
+    dayHeaderContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    dayHeaderText: {
+        fontSize: FontSize.fontSmall,
+        color: Colors.TEXT_LITE_GRAY,
+        fontFamily: Fonts.medium,
+        opacity: 0.7,
+        backgroundColor: Colors.PRIMARY,
+        padding: 5,
+        borderRadius: 10,
+    }
 })
 
 export default styles;

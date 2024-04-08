@@ -6,16 +6,22 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor:Colors.PRIMARY
     },
+    headerContainer: {
+        flexDirection: 'row',
+        marginTop: height * 0.07,
+        marginHorizontal: width * 0.05,
+        alignItems: 'center',
+        gap: 10
+    },
     inputField: {
+        flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 20,
         paddingVertical: 8,
         backgroundColor: Colors.INPUT_FIELD,
-        marginHorizontal: width * 0.05,
         borderRadius: 12,
-        marginTop: height * 0.07
     },
     input: {
         flex: 1,

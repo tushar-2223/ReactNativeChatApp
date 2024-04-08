@@ -40,21 +40,29 @@ const SocialButtons = (props: SocialButtonsProps) => {
                 profilePicture: user?.photoURL,
                 provider: String.google
             }
-            database().ref(`users/${user.uid}`).set(userObj).then(() => {
-                dispatch(addUser(userObj));
-                setLoader(false);
-                Toast.show({
-                    type: 'success',
-                    text1: String.logInSuccess,
-                });
-                navigation.dispatch(
-                    CommonActions.reset({
+            
+            const userRef = database().ref('users/' + user?.uid);
+            userRef.once('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    dispatch(addUser(userObj));
+                    navigation.dispatch(CommonActions.reset({
                         index: 0,
-                        routes: [{ name: Routes.Authentication }],
-                    }),
-                );
-                GoogleSignin.revokeAccess();
+                        routes: [{ name: Routes.Authentication }]
+                    }));
+                } else {
+                    userRef.set(userObj);
+                    dispatch(addUser(userObj));
+                    navigation.dispatch(CommonActions.reset({
+                        index: 0,
+                        routes: [{ name: Routes.Authentication }]
+                    }));
+                }
             });
+            Toast.show({
+                type: 'success',
+                text1: String.logInSuccess
+            });
+            setLoader(false);
         } catch (error: any) {
             if (error.code === 'auth/invalid-credential') {
                 setLoader(false);

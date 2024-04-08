@@ -27,6 +27,9 @@ export const String = {
     yesterday: 'Yesterday',
     displayname: 'Display name',
     emailAddress: 'Email address',
+    createGroup: 'Create group',
+    dataNull: 'Data not found',
+    typeMessage: 'Type a message',
 
     logInSuccess: 'Log in successfully',
     emailRequired: 'Email is required',

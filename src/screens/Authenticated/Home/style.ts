@@ -17,8 +17,6 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.SOCIAL_BUTTON,
         borderRadius: 100
     },
-    userIcon: {
-    },
     headerText: {
         fontSize: FontSize.fontXXLarge,
         color: Colors.PRIMARY,

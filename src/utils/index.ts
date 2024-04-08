@@ -14,8 +14,11 @@ const minAgo = (date: Date) => {
         return 'Just now';
     } else if (diff < 3600000) {
         return `${Math.floor(diff / 60000)}min ago`;
+    } else if (diff < 86400000) {
+        return `${Math.floor(diff / 3600000)}h ago`;
+    } else {
+        return `${Math.floor(diff / 86400000)}d ago`;
     }
-    return `${Math.floor(diff / 3600000)}h ago`;
 }
 
 export {

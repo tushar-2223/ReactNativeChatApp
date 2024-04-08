@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Button, FlatList, Image, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, FlatList, Image, TouchableOpacity } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Icon from 'react-native-vector-icons/Ionicons';
 import moment from 'moment';
@@ -8,7 +8,6 @@ import { Colors, String } from '../../../utils';
 import database from '@react-native-firebase/database';
 import styles from './style';
 import { AuthenticatedNavigatorType } from '../../../routes/Authenticated';
-import CustomLoader from '../../../components/view/CustomLoader';
 
 type ConversationType = NativeStackScreenProps<AuthenticatedNavigatorType, 'Conversation'>;
 
@@ -17,21 +16,28 @@ interface ConversationMessage {
   senderId: string;
   receiverId: string;
   timestamp: string;
-  receiverName: string;
-  receiverProfilePicture: string;
 }
 
 const Conversation = ({ navigation, route }: ConversationType) => {
-  const { id, userName, profilePicture } = route.params;
+  const { id } = route.params;
   const user = useSelector((state: any) => state.userReducer.userInfo);
   const [input, setInput] = useState<string>('');
-  const [conversations, setConversations] = useState<ConversationMessage[]>([]);
-  const [day, setDay] = useState<string>(String.today);
-  const [loader, setLoader] = useState<boolean>(false);
+  const [conversations, setConversations] = useState<Record<string, ConversationMessage[]>>({});
+  const [receiverData, setReceiverData] = useState<any>({});
 
   useEffect(() => {
     fetchConversations();
+    fetchReceiverData(id)
   }, []);
+
+  const fetchReceiverData = async (id: string) => {
+    try {
+      const snapshot = await database().ref(`users/${id}`).once('value');
+      setReceiverData(snapshot.val());
+    } catch (error) {
+      console.log('Error fetching receiver data:', error);
+    }
+  };
 
   const fetchConversations = async () => {
     try {
@@ -45,22 +51,31 @@ const Conversation = ({ navigation, route }: ConversationType) => {
 
         conversationRef.on('value', (snapshot) => {
           const snapshotData = snapshot.val();
-          const messages: ConversationMessage[] = [];
+          const messages: Record<string, ConversationMessage[]> = {};
 
           for (let key in snapshotData) {
             const message = snapshotData[key];
             const day = getDay(message.timestamp);
-            messages.push({ ...message, day });
+            if (!messages[day]) {
+              messages[day] = [];
+            }
+            messages[day].push({
+              content: message.content,
+              senderId: message.senderId,
+              receiverId: message.receiverId,
+              timestamp: message.timestamp,
+            });
           }
           setConversations(messages);
         });
       } else {
-        setConversations([]);
+        setConversations({});
       }
     } catch (error) {
       console.log('Error fetching conversations:', error);
     }
   };
+
 
   const sendMessage = async () => {
     try {
@@ -72,9 +87,7 @@ const Conversation = ({ navigation, route }: ConversationType) => {
         content: input,
         senderId: user.uuid,
         receiverId: id,
-        timestamp: new Date().toISOString(),
-        receiverName: userName,
-        receiverProfilePicture: profilePicture,
+        timestamp: new Date().toISOString()
       };
 
       const receiverRef = database().ref(`users/${id}/conversation/${user.uuid}`);
@@ -106,8 +119,22 @@ const Conversation = ({ navigation, route }: ConversationType) => {
 
       const conversationRef = database().ref(`conversations/${conversationKey}`);
       await Promise.all([
-        database().ref(`users/${id}/conversation/${user.uuid}`).update(newMessage),
-        database().ref(`users/${user.uuid}/conversation/${id}`).update(newMessage),
+        database().ref(`users/${id}/conversation/${user.uuid}`).update({
+          content: input,
+          timestamp: new Date().toString(),
+          conversationKey: conversationKey,
+          receiverId: user.uuid,
+          userName: user.userName,
+          profilePicture: user.profilePicture
+        }),
+        database().ref(`users/${user.uuid}/conversation/${id}`).update({
+          content: input,
+          timestamp: new Date().toString(),
+          conversationKey: conversationKey,
+          receiverId: id,
+          userName: receiverData.userName,
+          profilePicture: receiverData.profilePicture
+        }),
         conversationRef.push().set(newMessage),
       ]);
 
@@ -124,11 +151,11 @@ const Conversation = ({ navigation, route }: ConversationType) => {
     const yesterday = moment().subtract(1, 'days').format('YYYY-MM-DD');
 
     if (today === messageDate) {
-      setDay(String.today);
+      return String.today;
     } else if (yesterday === messageDate) {
-      setDay(String.yesterday);
+      return String.yesterday;
     } else {
-      setDay(moment(timestamp).format('MMM DD, YYYY'));
+      return moment(timestamp).format('MMM DD, YYYY');
     }
   }
 
@@ -136,9 +163,9 @@ const Conversation = ({ navigation, route }: ConversationType) => {
     const isSender = item.senderId === user.uuid;
     return (
       <View style={[styles.messageContainer, { alignSelf: isSender ? 'flex-end' : 'flex-start' }]}>
-        {!isSender && <Image source={item.receiverProfilePicture ? { uri: item.receiverProfilePicture } : require('../../../assets/Images/user.jpg')} style={styles.userImage} />}
+        {!isSender && <Image source={receiverData.profilePicture ? { uri: receiverData.profilePicture } : require('../../../assets/Images/user.jpg')} style={styles.userImage} />}
         <View>
-          <Text style={styles.senderName}>{isSender ? String.you : item.receiverName}</Text>
+          <Text style={styles.senderName}>{isSender ? String.you : receiverData.userName}</Text>
           <View style={[styles.chatBubble, { borderTopStartRadius: isSender ? 15 : 0, borderTopEndRadius: isSender ? 0 : 15 }]}>
             <Text style={styles.message}>{item.content}</Text>
           </View>
@@ -148,14 +175,22 @@ const Conversation = ({ navigation, route }: ConversationType) => {
     );
   };
 
+  const renderDayHeader = (day: string) => {
+    return (
+      <View style={styles.dayHeaderContainer}>
+        <Text style={styles.dayHeaderText}>{day}</Text>
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Icon name="arrow-back" size={24} color={Colors.DARK} style={styles.searchIcon} onPress={() => navigation.goBack()} />
         <View style={styles.userContainer}>
-          <Image source={profilePicture ? { uri: profilePicture } : require('../../../assets/Images/user.jpg')} style={styles.userImage} />
+          <Image source={receiverData.profilePicture ? { uri: receiverData.profilePicture } : require('../../../assets/Images/user.jpg')} style={styles.userImage} />
           <View>
-            <Text style={styles.headerText}>{userName}</Text>
+            <Text style={styles.headerText}>{receiverData.userName}</Text>
             <Text style={styles.userStatus}>{String.activeNow}</Text>
           </View>
         </View>
@@ -166,24 +201,36 @@ const Conversation = ({ navigation, route }: ConversationType) => {
       </View>
 
       <View style={styles.chatContainer}>
-        <Text style={styles.chatHeader}>{day}</Text>
         <FlatList
-          data={conversations}
-          keyExtractor={(item, index) => index.toString()}
+          data={Object.keys(conversations)}
           showsVerticalScrollIndicator={false}
-          renderItem={renderChatBubble}
+          keyExtractor={(item) => item}
+          renderItem={({ item }) => (
+            <View>
+              {item !== '' && renderDayHeader(item)}
+              <FlatList
+                data={conversations[item]}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={renderChatBubble}
+                inverted
+              />
+            </View>
+          )}
           inverted
         />
       </View>
 
       <View style={styles.inputContainer}>
-        <Icon name="attach" size={26} color={Colors.TEXT_LITE_GRAY} style={styles.attachIcon} />
-        <TextInput
-          style={styles.input}
-          placeholder="Type a message"
-          value={input}
-          onChangeText={setInput}
-        />
+        <View style={styles.inputField}>
+          <Icon name="attach" size={26} color={Colors.TEXT_LITE_GRAY} style={styles.attachIcon} />
+          <TextInput
+            style={styles.input}
+            placeholder={String.typeMessage}
+            value={input}
+            placeholderTextColor={Colors.TEXT_LITE_GRAY}
+            onChangeText={setInput}
+          />
+        </View>
         <TouchableOpacity
           onPress={sendMessage}
           style={styles.sendButton}
