@@ -21,6 +21,7 @@ const SearchUser = ({ navigation }: SearchUserProps) => {
   const [userdata, setUserData] = useState<UserInfo[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<UserInfo[]>([]);
   const [loader, setLoader] = useState<boolean>(false);
+  const [groups, setGroups] = useState<any[]>([]);
   const userId = useSelector((state: any) => state.userReducer.userInfo.uuid);
 
   useEffect(() => {
@@ -38,9 +39,11 @@ const SearchUser = ({ navigation }: SearchUserProps) => {
         const users = snapshot.val();
         delete users[userId];
         const data = [];
-        for (let id in users) {
-          data.push(users[id]);
+
+        for (let key in users) {
+          data.push(users[key]);
         }
+
         setUserData(data);
         setLoader(false);
       });

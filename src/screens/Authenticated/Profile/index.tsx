@@ -91,7 +91,7 @@ const Profile = ({ navigation }: ProfileProps) => {
         title={title}
         message={message}
         button1Text={String.ok}
-        button1Action={() => handleLogout()}
+        button1Action={handleLogout}
         button2Text={String.cancel}
         button2Action={() => setModal(false)}
       />

@@ -54,6 +54,14 @@ const styles = StyleSheet.create({
         fontFamily:Fonts.regular,
         color: Colors.TEXT_LITE_GRAY,
         opacity: 0.7
+    },
+
+    groupText: {
+        fontSize: FontSize.fontLarge,
+        fontFamily: Fonts.medium,
+        color: Colors.DARK,
+        marginHorizontal: width * 0.05,
+        marginTop: height * 0.05
     }
 })
 

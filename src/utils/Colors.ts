@@ -16,4 +16,6 @@ export const Colors = {
     NOTIFICATION_RIPPLE: '#F04A4C',
     INPUT_FIELD: '#F3F6F6',
     CHAT_BUBBLE: '#3D4A7A',
+    LITE_GREEN: '#01ff2353',
+    RECEIVER_CHAT_BUBBLE: '#F2F7FB',
 } as const;

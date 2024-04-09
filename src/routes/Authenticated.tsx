@@ -13,7 +13,7 @@ export type AuthenticatedNavigatorType = {
   [Routes.Home]: undefined,
   [Routes.SearchUser]: undefined,
   [Routes.Profile]: undefined,
-  [Routes.Conversation]: { id: string },
+  [Routes.Conversation]: { id: string, type?: string },
   [Routes.Creategroup]: undefined
 };
 
@@ -32,7 +32,7 @@ const Authenticated = () => {
       <Stack.Screen name={Routes.SearchUser} component={SearchUser} />
       <Stack.Screen name={Routes.Profile} component={Profile} />
       <Stack.Screen name={Routes.Conversation} component={Conversation} />
-      <Stack.Screen name={Routes.Creategroup} component={Creategroup}/>
+      <Stack.Screen name={Routes.Creategroup} component={Creategroup} />
     </Stack.Navigator>
   )
 }

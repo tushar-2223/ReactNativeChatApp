@@ -20,11 +20,14 @@ interface HomeProps {
 
 interface ChatUserData {
   content: string;
-  ConversationKey: string;
+  conversationKey: string;
   timestamp: string;
-  receiverId: string;
-  receiverName: string;
-  receiverProfilePicture: string;
+  receiverId?: string;
+  receiverName?: string;
+  profilePicture?: string;
+  //for group chat
+  groupName?: string;
+  type?: string;
 }
 
 const Home = ({ navigation }: HomeProps) => {
@@ -72,11 +75,13 @@ const Home = ({ navigation }: HomeProps) => {
               const chat = data[key];
               chatData.push({
                 content: chat.content,
-                ConversationKey: chat.ConversationKey,
+                conversationKey: chat.conversationKey,
                 timestamp: chat.timestamp,
                 receiverId: chat.receiverId,
                 receiverName: chat.userName,
-                receiverProfilePicture: chat.profilePicture
+                profilePicture: chat.profilePicture,
+                groupName: chat.groupName,
+                type: chat.type
               });
             }
             chatData.sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
@@ -111,13 +116,18 @@ const Home = ({ navigation }: HomeProps) => {
   const renderChatItems = ({ item }: any) => {
     return (
       <TouchableOpacity style={styles.chatContainerBox} onPress={
-        () => navigation.navigate(Routes.Conversation, { id: item.receiverId })
+        () => navigation.navigate(Routes.Conversation, {
+          id: item.type === 'group' ? item.conversationKey : item.receiverId,
+          type: item.type
+        })
       }
       >
-        <Image source={item.receiverProfilePicture ? { uri: item.receiverProfilePicture } : require('../../../assets/Images/user.jpg')
+        <Image source={item.profilePicture ? { uri: item.profilePicture } : require('../../../assets/Images/user.jpg')
         } style={styles.chatUserImage} />
         <View style={styles.userDetailed}>
-          <Text style={styles.userName}>{item.receiverName}</Text>
+          <Text style={styles.userName}>{item.receiverName ? item.receiverName
+            : item.groupName
+          }</Text>
           <Text style={styles.lastChat}>{item.content}</Text>
         </View>
         <View style={styles.chatTimeContainer}>

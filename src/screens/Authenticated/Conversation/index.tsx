@@ -14,30 +14,61 @@ type ConversationType = NativeStackScreenProps<AuthenticatedNavigatorType, 'Conv
 interface ConversationMessage {
   content?: string;
   senderId: string;
-  receiverId: string;
+  receiverId?: string;
   timestamp: string;
+  //for group chat
+  senderName?: string;
+  profilePicture?: string;
 }
 
 const Conversation = ({ navigation, route }: ConversationType) => {
-  const { id } = route.params;
+  const { id, type } = route.params;
   const user = useSelector((state: any) => state.userReducer.userInfo);
   const [input, setInput] = useState<string>('');
   const [conversations, setConversations] = useState<Record<string, ConversationMessage[]>>({});
-  const [receiverData, setReceiverData] = useState<any>({});
+  const [receiverData, setReceiverData] = useState<any>({}); // User | Group
+  const [fetchGroupSelectedUsers, setFetchGroupSelectedUsers] = useState<string[]>([]);
 
   useEffect(() => {
     fetchConversations();
-    fetchReceiverData(id)
+    fetchReceiverData();
+    type === 'group' && fetchSelectedUsers();
   }, []);
 
-  const fetchReceiverData = async (id: string) => {
+  const fetchReceiverData = async () => {
     try {
       const snapshot = await database().ref(`users/${id}`).once('value');
-      setReceiverData(snapshot.val());
+      const groupRef = database().ref(`users/${user.uuid}/conversation/${id}`);
+
+      if (type === 'group') {
+        const groupSnapshot = await groupRef.once('value');
+        if (groupSnapshot.exists()) {
+          setReceiverData(groupSnapshot.val());
+        }
+      } else {
+        if (snapshot.exists()) {
+          setReceiverData(snapshot.val());
+        }
+      }
     } catch (error) {
       console.log('Error fetching while receiver data:', error);
     }
   };
+
+  const fetchSelectedUsers = async () => {
+    try {
+      const conversationRef = database().ref(`conversations/${id}/allUsers`);
+      const snapshot = await conversationRef.once('value');
+
+      if (snapshot.exists()) {
+        const selectedUsers = snapshot.val();
+        setFetchGroupSelectedUsers(selectedUsers);
+      }
+    }
+    catch (error) {
+      console.log('Error fetching group selected users:', error);
+    }
+  }
 
   const fetchConversations = async () => {
     try {
@@ -45,8 +76,8 @@ const Conversation = ({ navigation, route }: ConversationType) => {
       const senderRef = database().ref(`users/${user.uuid}/conversation/${id}`);
       const [receiverSnapshot, senderSnapshot] = await Promise.all([receiverRef.once('value'), senderRef.once('value')]);
 
-      if (receiverSnapshot.exists() && senderSnapshot.exists()) {
-        const conversationKey = receiverSnapshot.val().conversationKey;
+      if (receiverSnapshot.exists() || senderSnapshot.exists()) {
+        const conversationKey = senderSnapshot.val().conversationKey;
         const conversationRef = database().ref(`conversations/${conversationKey}`).orderByChild('timestamp');
 
         conversationRef.on('value', (snapshot) => {
@@ -64,8 +95,11 @@ const Conversation = ({ navigation, route }: ConversationType) => {
               senderId: message.senderId,
               receiverId: message.receiverId,
               timestamp: message.timestamp,
+              senderName: message.senderName,
+              profilePicture: message.profilePicture,
             });
           }
+
           setConversations(messages);
         });
       } else {
@@ -88,6 +122,38 @@ const Conversation = ({ navigation, route }: ConversationType) => {
         receiverId: id,
         timestamp: new Date().toISOString()
       };
+
+      const groupMessage: ConversationMessage = {
+        content: input,
+        senderId: user.uuid,
+        timestamp: new Date().toISOString(),
+        senderName: user.userName,
+        profilePicture: user.profilePicture ? user.profilePicture : '',
+      };
+
+      if (type === 'group') {
+        const groupRef = database().ref(`users/${user.uuid}/conversation/${id}`);
+        const groupSnapshot = await groupRef.once('value');
+
+        if (groupSnapshot.exists()) {
+          const conversationKey = groupSnapshot.val().conversationKey;
+          const conversationRef = database().ref(`conversations/${conversationKey}`);
+
+          fetchGroupSelectedUsers.map(async (uuid) => {
+            const userRef = database().ref(`users/${uuid}/conversation/${id}`);
+            await userRef.update({
+              content: input,
+              timestamp: new Date().toISOString(),
+            });
+          });
+
+          await conversationRef.push().set(groupMessage);
+
+          setInput('');
+          fetchConversations();
+          return;
+        }
+      }
 
       const receiverRef = database().ref(`users/${id}/conversation/${user.uuid}`);
       const senderRef = database().ref(`users/${user.uuid}/conversation/${id}`);
@@ -161,12 +227,19 @@ const Conversation = ({ navigation, route }: ConversationType) => {
   const renderChatBubble = ({ item }: { item: ConversationMessage }) => {
     const isSender = item.senderId === user.uuid;
     return (
-      <View style={[styles.messageContainer, { alignSelf: isSender ? 'flex-end' : 'flex-start' }]}>
-        {!isSender && <Image source={receiverData.profilePicture ? { uri: receiverData.profilePicture } : require('../../../assets/Images/user.jpg')} style={styles.userImage} />}
+      <View style={[styles.messageContainer, {
+        alignSelf: isSender ? 'flex-end' : 'flex-start'
+      }]}>
+        {!isSender && <Image source={item.profilePicture ? { uri: item.profilePicture } : require('../../../assets/Images/user.jpg')} style={styles.userImage} />}
         <View>
-          <Text style={styles.senderName}>{isSender ? String.you : receiverData.userName}</Text>
-          <View style={[styles.chatBubble, { borderTopStartRadius: isSender ? 15 : 0, borderTopEndRadius: isSender ? 0 : 15 }]}>
-            <Text style={styles.message}>{item.content}</Text>
+          <Text style={styles.senderName}>{isSender ? String.you : type === 'group' ? item.senderName : receiverData.userName}</Text>
+          <View style={[styles.chatBubble, {
+            borderTopStartRadius: isSender ? 15 : 0, borderTopEndRadius: isSender ? 0 : 15,
+            backgroundColor: isSender ? Colors.CHAT_BUBBLE : Colors.RECEIVER_CHAT_BUBBLE,
+          }]}>
+            <Text style={[styles.message,
+            { color: isSender ? Colors.PRIMARY : Colors.DARK }]}>{item.content}
+            </Text>
           </View>
           <Text style={styles.timestamp}>{moment(item.timestamp).format('hh:mm A')}</Text>
         </View>
@@ -189,7 +262,10 @@ const Conversation = ({ navigation, route }: ConversationType) => {
         <View style={styles.userContainer}>
           <Image source={receiverData.profilePicture ? { uri: receiverData.profilePicture } : require('../../../assets/Images/user.jpg')} style={styles.userImage} />
           <View>
-            <Text style={styles.headerText}>{receiverData.userName}</Text>
+            <Text style={styles.headerText}>{receiverData.userName ?
+              receiverData.userName : receiverData.groupName
+            }
+            </Text>
             <Text style={styles.userStatus}>{String.activeNow}</Text>
           </View>
         </View>
