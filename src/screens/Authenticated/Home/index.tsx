@@ -133,7 +133,7 @@ const Home = ({ navigation }: HomeProps) => {
           <Text style={styles.userName}>{item.receiverName ? item.receiverName
             : item.groupName
           }</Text>
-          <Text style={styles.lastChat}>{item.content}</Text>
+          <Text style={styles.lastChat} numberOfLines={1}>{item.content}</Text>
         </View>
         <View style={styles.chatTimeContainer}>
           <Text style={styles.chatTime}>{minAgo(item.timestamp)}</Text>

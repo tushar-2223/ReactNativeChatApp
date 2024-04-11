@@ -100,7 +100,6 @@ const Conversation = ({ navigation, route }: ConversationType) => {
               senderName: message.senderName,
               profilePicture: message.profilePicture,
             });
-
             //sort messages by timestamp
             messages[day].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
           }

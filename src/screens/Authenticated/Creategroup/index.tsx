@@ -12,16 +12,10 @@ import Toast from 'react-native-toast-message'
 import { launchImageLibrary } from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage'
 import { Routes } from '../../../routes/Routes'
+import { UserInfo } from '../../../redux-toolkit/userSlice'
 
 interface CreategroupProps {
     navigation: NativeStackNavigationProp<AuthenticatedNavigatorType>
-}
-
-interface User {
-    email: string;
-    userName: string;
-    profilePicture: string;
-    uuid: string;
 }
 
 interface Group {
@@ -35,7 +29,7 @@ interface Group {
 
 const Creategroup = ({ navigation }: CreategroupProps) => {
     const [groupName, setGroupName] = useState<string>('');
-    const [fetchUsers, setFetchUsers] = useState<User[]>([]);
+    const [fetchUsers, setFetchUsers] = useState<UserInfo[]>([]);
     const [groupSelectedUsers, setGroupSelectedUsers] = useState<string[]>([]);
     const [profileImage, setProfileImage] = useState<string>('');
 
@@ -47,7 +41,7 @@ const Creategroup = ({ navigation }: CreategroupProps) => {
         const ref = database().ref('users');
         ref.on('value', snapshot => {
             const data = snapshot.val();
-            const users: User[] = [];
+            const users: UserInfo[] = [];
             for (let key in data) {
                 users.push(data[key]);
             }
@@ -154,6 +148,33 @@ const Creategroup = ({ navigation }: CreategroupProps) => {
         }
     }
 
+    const groupUserList = () => {
+        return (
+            <View style={styles.groupUserList}>
+                {
+                    fetchUsers &&
+                    fetchUsers.map((user, index) => {
+                        return (
+                            <TouchableOpacity key={index} style={styles.groupUserItem} onPress={
+                                () => selectedGroupUser(user.uuid ? user.uuid : '')
+                            }>
+                                <Image source={user.profilePicture ? { uri: user.profilePicture } : require('../../../assets/Images/user.jpg')
+                                } style={styles.groupUserImage} />
+                                <View style={styles.plusIcon}>
+                                    <Feather name={
+                                        groupSelectedUsers.includes(
+                                            user.uuid ? user.uuid : ''
+                                        ) ? 'check' : 'plus'
+                                    } size={20} color={Colors.DARK} />
+                                </View>
+                            </TouchableOpacity>
+                        )
+                    })
+                }
+            </View>
+        )
+    }
+
     return (
         <View style={styles.container}>
             {header()}
@@ -173,7 +194,8 @@ const Creategroup = ({ navigation }: CreategroupProps) => {
                     </View>
                     <TextInput
                         style={styles.groupName}
-                        placeholder="Group Name"
+                        placeholder={String.groupName}
+                        placeholderTextColor={Colors.TEXT_LITE_GRAY}
                         value={groupName}
                         onChangeText={(text) => setGroupName(text)}
                     />
@@ -181,26 +203,7 @@ const Creategroup = ({ navigation }: CreategroupProps) => {
 
                 <View style={styles.groupUserContainer}>
                     <Text style={styles.invitedMember}>{String.invitedMembers}</Text>
-                    <View style={styles.groupUserList}>
-                        {
-                            fetchUsers &&
-                            fetchUsers.map((user, index) => {
-                                return (
-                                    <TouchableOpacity key={index} style={styles.groupUserItem} onPress={
-                                        () => selectedGroupUser(user.uuid)
-                                    }>
-                                        <Image source={user.profilePicture ? { uri: user.profilePicture } : require('../../../assets/Images/user.jpg')
-                                        } style={styles.groupUserImage} />
-                                        <View style={styles.plusIcon}>
-                                            <Feather name={
-                                                groupSelectedUsers.includes(user.uuid) ? 'check' : 'plus'
-                                            } size={20} color={Colors.DARK} />
-                                        </View>
-                                    </TouchableOpacity>
-                                )
-                            })
-                        }
-                    </View>
+                    {groupUserList()}
                 </View>
             </ScrollView>
 

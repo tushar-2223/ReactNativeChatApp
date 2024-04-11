@@ -59,8 +59,8 @@ const styles = StyleSheet.create({
         fontSize: FontSize.fontXXLarge,
         fontFamily: Fonts.semiBold,
         color: Colors.TEXT_LITE_GRAY,
-        marginVertical: height * 0.02,
-        marginHorizontal: width * 0.05,
+        marginTop: height * 0.02,
+        textAlign: 'center',
     }
 });
 
