@@ -1,4 +1,4 @@
-import { View, Text, Button, TouchableOpacity, Image } from 'react-native'
+import { View, Text, TouchableOpacity, Image, TextInput, ScrollView } from 'react-native'
 import React, { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
@@ -30,13 +30,6 @@ const Profile = ({ navigation }: ProfileProps) => {
   const [message, setMessage] = useState<string>('');
   const [modalType, setModalType] = useState<ModalType>(ModalType.ALERT);
 
-  const openModal = (title: string, type: ModalType, message: string) => {
-    setModal(true)
-    setTitle(title)
-    setModalType(type)
-    setMessage(message)
-  }
-
   const handleLogout = async () => {
     try {
       if (user?.provider === 'Google') {
@@ -62,6 +55,13 @@ const Profile = ({ navigation }: ProfileProps) => {
         text2: error.message,
       })
     }
+  }
+
+  const openModal = (title: string, type: ModalType, message: string) => {
+    setModal(true)
+    setTitle(title)
+    setModalType(type)
+    setMessage(message)
   }
 
   const socialPanel = () => (
@@ -102,9 +102,11 @@ const Profile = ({ navigation }: ProfileProps) => {
         </TouchableOpacity>
 
         <View style={styles.userDetailed}>
-          <Image source={
-            user?.provider === 'Google' ? { uri: user?.profilePicture } : require('../../../assets/Images/user.jpg')
-          } style={styles.profilePicture} />
+          <Image
+            source={user?.profilePicture ? { uri: user?.profilePicture } : require('../../../assets/Images/user.jpg')}
+            style={styles.profilePicture}
+          />
+
           <Text style={styles.userName}>{user?.userName}</Text>
         </View>
         {socialPanel()}
@@ -121,13 +123,13 @@ const Profile = ({ navigation }: ProfileProps) => {
         </View>
         <View style={styles.buttonContainer}>
           <CustomButton
-            title="Logout"
+            title={String.logout}
             onPress={() => openModal(String.logout, ModalType.ALERT, String.logoutMessage)}
             gradient={[Colors.ERROR_TEXT, Colors.ERROR_TEXT]}
-            mt={20}
           />
         </View>
       </View>
+
     </AppBackground>
   )
 }

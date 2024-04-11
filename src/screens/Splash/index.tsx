@@ -10,24 +10,24 @@ import { Routes } from '../../routes/Routes'
 import SplashScreen from 'react-native-splash-screen'
 
 interface SplaceProps {
-  navigation:NativeStackNavigationProp<RootNavigatorType,'Splash'>
+  navigation: NativeStackNavigationProp<RootNavigatorType, 'Splash'>
 }
 
 const Splash = ({ navigation }: SplaceProps) => {
-  
+
   const user = useSelector((state: any) => state.userReducer.userInfo);
-  
+
   useEffect(() => {
     setTimeout(() => {
       SplashScreen.hide()
       if (user) {
         navigation.replace(Routes.Authentication)
-      }else{
+      } else {
         navigation.replace(Routes.UnAuthenticated)
       }
     }, 3000)
   }, [])
-  
+
   return (
     <AppBackground>
       <View style={styles.container}>

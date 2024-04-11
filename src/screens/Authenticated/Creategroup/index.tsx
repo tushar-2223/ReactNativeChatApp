@@ -79,8 +79,6 @@ const Creategroup = ({ navigation }: CreategroupProps) => {
                 task.then(async () => {
                     const url = await storageRef.getDownloadURL();
                     setProfileImage(url);
-
-                    console.log(url);
                 });
             }
         });
@@ -185,6 +183,7 @@ const Creategroup = ({ navigation }: CreategroupProps) => {
                     <Text style={styles.invitedMember}>{String.invitedMembers}</Text>
                     <View style={styles.groupUserList}>
                         {
+                            fetchUsers &&
                             fetchUsers.map((user, index) => {
                                 return (
                                     <TouchableOpacity key={index} style={styles.groupUserItem} onPress={
@@ -210,6 +209,7 @@ const Creategroup = ({ navigation }: CreategroupProps) => {
                     title={String.create}
                     onPress={createGroup}
                     gradient={[Colors.TITLE_TEXT, Colors.TITLE_TEXT]}
+                    mt={20}
                 />
             </View>
         </View>

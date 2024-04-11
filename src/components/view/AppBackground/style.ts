@@ -7,13 +7,13 @@ const styles = StyleSheet.create({
     },
     backgroundImage: {
         position: 'absolute',
-        width: width,
+        width: '100%',
         zIndex: -1,
         objectFit: 'cover',
     },
     gradiantImage: {
         position: 'absolute',
-        width: width,
+        width: '100%',
         transform:[{translateY: -height * 0.1}],
     }
 });

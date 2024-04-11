@@ -21,6 +21,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         gap: 10,
         marginLeft: 10,
+        alignItems: 'center',
     },
     headerText: {
         fontSize: FontSize.fontLarge,
@@ -49,7 +50,7 @@ const styles = StyleSheet.create({
         gap: 10,
     },
     senderName: {
-        fontSize: FontSize.fontSmall,
+        fontSize: FontSize.fontNormal,
         color: Colors.DARK,
         fontFamily: Fonts.medium,
     },
@@ -90,7 +91,7 @@ const styles = StyleSheet.create({
         flex: 1,
         fontFamily: Fonts.regular,
         fontSize: FontSize.fontSmall,
-        color: Colors.DARK,
+        color: Colors.DARK
     },
     sendButton: {
         padding: 11,
@@ -117,13 +118,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     dayHeaderText: {
-        fontSize: FontSize.fontSmall,
         color: Colors.TEXT_LITE_GRAY,
         fontFamily: Fonts.medium,
-        opacity: 0.7,
-        backgroundColor: Colors.PRIMARY,
         padding: 5,
-        borderRadius: 10,
     }
 })
 

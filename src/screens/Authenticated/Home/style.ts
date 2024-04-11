@@ -66,8 +66,9 @@ const styles = StyleSheet.create({
     storyText: {
         color: Colors.PRIMARY,
         fontFamily: Fonts.regular,
+        width: width * 0.15,
+        textAlign: 'center',
     },
-
 
     chatContainerBox: {
         flexDirection: 'row',

@@ -1,4 +1,4 @@
-import { View, Text, Image, FlatList, TouchableOpacity, Button, BackHandler } from 'react-native'
+import { View, Text, Image, FlatList, TouchableOpacity, BackHandler, VirtualizedList } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import styles from './style'
 import { Routes } from '../../../routes/Routes'
@@ -13,6 +13,7 @@ import CustomLoader from '../../../components/view/CustomLoader'
 import CustomModal from '../../../components/view/CustomModal'
 import { ModalType } from '../../../components/view/CustomModal'
 import { useIsFocused } from '@react-navigation/native'
+import { UserInfo } from '../../../redux-toolkit/userSlice'
 
 interface HomeProps {
   navigation: NativeStackNavigationProp<AuthenticatedNavigatorType>
@@ -41,6 +42,7 @@ const Home = ({ navigation }: HomeProps) => {
   const [modalType, setModalType] = useState<ModalType>(ModalType.ALERT);
   const isFocusedScreen = useIsFocused();
 
+  //handle back button action
   useEffect(() => {
     const backAction = () => {
       openModal(String.alert, ModalType.BACKHANDLER, String.backActionMessage)
@@ -57,7 +59,7 @@ const Home = ({ navigation }: HomeProps) => {
     return () => backHandler.remove();
   }, [isFocusedScreen]);
 
-
+  //fetch conversation data for displaying chat and last message
   useEffect(() => {
     setLoader(true);
     try {
@@ -104,11 +106,14 @@ const Home = ({ navigation }: HomeProps) => {
       <View style={styles.storyContainer}>
         <View style={[styles.storyImageContainer, { borderColor: item.borderColor }]}>
           <Image
-            source={item.profileImage}
+            source={item.profilePicture ? { uri: item.profilePicture } : require('../../../assets/Images/user.jpg')}
             style={styles.storyImage}
           />
         </View>
-        <Text style={styles.storyText}>{item.name}</Text>
+        <Text style={styles.storyText}
+          numberOfLines={1}
+          ellipsizeMode='tail'
+        >{item.userName}</Text>
       </View>
     )
   }
@@ -190,7 +195,7 @@ const Home = ({ navigation }: HomeProps) => {
         <View style={styles.statusContainer}>
           <FlatList
             data={storyData}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item, index) => index.toString()}
             horizontal
             showsHorizontalScrollIndicator={false}
             renderItem={renderStoryItems}

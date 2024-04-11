@@ -39,6 +39,8 @@ export const String = {
     messageEmpty: 'Message can not be empty',
     groupCreatedSuccess: 'Group created successfully',
     groups: 'Groups',
+    editProfile: 'Edit Profile',
+    groupUsers: 'Group Users',
 
     logInSuccess: 'Log in successfully',
     emailRequired: 'Email is required',

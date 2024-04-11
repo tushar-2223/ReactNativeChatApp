@@ -66,14 +66,14 @@ const styles = StyleSheet.create({
     groupUserList: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        marginTop: height * 0.01
+        marginTop: height * 0.01,
+        marginBottom: height * 0.1
     },
     groupUserItem: {
         alignItems: 'center',
         justifyContent: 'center',
         position: 'relative',
         margin: 5,
-        
     },
     groupUserImage: {
         width: width * 0.16,

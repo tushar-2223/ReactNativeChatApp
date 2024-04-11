@@ -8,6 +8,7 @@ import { Colors, String } from '../../../utils';
 import database from '@react-native-firebase/database';
 import styles from './style';
 import { AuthenticatedNavigatorType } from '../../../routes/Authenticated';
+import { Routes } from '../../../routes/Routes';
 
 type ConversationType = NativeStackScreenProps<AuthenticatedNavigatorType, 'Conversation'>;
 
@@ -26,7 +27,7 @@ const Conversation = ({ navigation, route }: ConversationType) => {
   const user = useSelector((state: any) => state.userReducer.userInfo);
   const [input, setInput] = useState<string>('');
   const [conversations, setConversations] = useState<Record<string, ConversationMessage[]>>({});
-  const [receiverData, setReceiverData] = useState<any>({}); // User | Group
+  const [receiverData, setReceiverData] = useState<any>({}); // Users | Group Details
   const [fetchGroupSelectedUsers, setFetchGroupSelectedUsers] = useState<string[]>([]);
 
   useEffect(() => {
@@ -35,6 +36,7 @@ const Conversation = ({ navigation, route }: ConversationType) => {
     type === 'group' && fetchSelectedUsers();
   }, []);
 
+  // fetch receiver data and group details for header
   const fetchReceiverData = async () => {
     try {
       const snapshot = await database().ref(`users/${id}`).once('value');
@@ -55,6 +57,7 @@ const Conversation = ({ navigation, route }: ConversationType) => {
     }
   };
 
+  //fetch group selected users
   const fetchSelectedUsers = async () => {
     try {
       const conversationRef = database().ref(`conversations/${id}/allUsers`);
@@ -64,12 +67,12 @@ const Conversation = ({ navigation, route }: ConversationType) => {
         const selectedUsers = snapshot.val();
         setFetchGroupSelectedUsers(selectedUsers);
       }
-    }
-    catch (error) {
+    } catch (error) {
       console.log('Error fetching group selected users:', error);
     }
-  }
+  };
 
+  //fetch conversations from database and set in state (Single and Group Chat)
   const fetchConversations = async () => {
     try {
       const receiverRef = database().ref(`users/${id}/conversation/${user.uuid}`);
@@ -84,12 +87,11 @@ const Conversation = ({ navigation, route }: ConversationType) => {
           const snapshotData = snapshot.val();
           const messages: Record<string, ConversationMessage[]> = {};
 
+          //fetch messages and sort by day
           for (let key in snapshotData) {
             const message = snapshotData[key];
             const day = getDay(message.timestamp);
-            if (!messages[day]) {
-              messages[day] = [];
-            }
+            messages[day] = messages[day] || [];
             messages[day].push({
               content: message.content,
               senderId: message.senderId,
@@ -98,8 +100,10 @@ const Conversation = ({ navigation, route }: ConversationType) => {
               senderName: message.senderName,
               profilePicture: message.profilePicture,
             });
-          }
 
+            //sort messages by timestamp
+            messages[day].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+          }
           setConversations(messages);
         });
       } else {
@@ -110,6 +114,7 @@ const Conversation = ({ navigation, route }: ConversationType) => {
     }
   };
 
+  //🚀 send message to database (Single and Group Chat)
   const sendMessage = async () => {
     try {
       if (!input.trim()) {
@@ -120,7 +125,7 @@ const Conversation = ({ navigation, route }: ConversationType) => {
         content: input,
         senderId: user.uuid,
         receiverId: id,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       const groupMessage: ConversationMessage = {
@@ -131,6 +136,7 @@ const Conversation = ({ navigation, route }: ConversationType) => {
         profilePicture: user.profilePicture ? user.profilePicture : '',
       };
 
+      //for group chat (update all users in group chat with new message)
       if (type === 'group') {
         const groupRef = database().ref(`users/${user.uuid}/conversation/${id}`);
         const groupSnapshot = await groupRef.once('value');
@@ -139,13 +145,13 @@ const Conversation = ({ navigation, route }: ConversationType) => {
           const conversationKey = groupSnapshot.val().conversationKey;
           const conversationRef = database().ref(`conversations/${conversationKey}`);
 
-          fetchGroupSelectedUsers.map(async (uuid) => {
+          await Promise.all(fetchGroupSelectedUsers.map(async (uuid) => {
             const userRef = database().ref(`users/${uuid}/conversation/${id}`);
             await userRef.update({
               content: input,
               timestamp: new Date().toISOString(),
             });
-          });
+          }));
 
           await conversationRef.push().set(groupMessage);
 
@@ -161,19 +167,20 @@ const Conversation = ({ navigation, route }: ConversationType) => {
 
       let conversationKey: any = '';
 
+      //create new conversation if not exists
       if (!receiverSnapshot.exists() || !senderSnapshot.exists()) {
         conversationKey = database().ref('conversations').push().key;
 
         if (!receiverSnapshot.exists()) {
-          database().ref(`users/${id}/conversation/${user.uuid}`).set({
-            conversationKey: conversationKey,
+          await database().ref(`users/${id}/conversation/${user.uuid}`).set({
+            conversationKey,
             content: '',
             timestamp: new Date().toString(),
           });
         }
         if (!senderSnapshot.exists()) {
-          database().ref(`users/${user.uuid}/conversation/${id}`).set({
-            conversationKey: conversationKey,
+          await database().ref(`users/${user.uuid}/conversation/${id}`).set({
+            conversationKey,
             content: '',
             timestamp: new Date().toString(),
           });
@@ -182,12 +189,13 @@ const Conversation = ({ navigation, route }: ConversationType) => {
         conversationKey = receiverSnapshot.val().conversationKey;
       }
 
+      //send message receiver and sender
       const conversationRef = database().ref(`conversations/${conversationKey}`);
       await Promise.all([
         database().ref(`users/${id}/conversation/${user.uuid}`).update({
           content: input,
           timestamp: new Date().toString(),
-          conversationKey: conversationKey,
+          conversationKey,
           receiverId: user.uuid,
           userName: user.userName,
           profilePicture: user.profilePicture
@@ -195,7 +203,7 @@ const Conversation = ({ navigation, route }: ConversationType) => {
         database().ref(`users/${user.uuid}/conversation/${id}`).update({
           content: input,
           timestamp: new Date().toString(),
-          conversationKey: conversationKey,
+          conversationKey,
           receiverId: id,
           userName: receiverData.userName,
           profilePicture: receiverData.profilePicture
@@ -210,6 +218,7 @@ const Conversation = ({ navigation, route }: ConversationType) => {
     }
   };
 
+  // for filtering messages by day
   const getDay = (timestamp: string) => {
     const today = moment().format('YYYY-MM-DD');
     const messageDate = moment(timestamp).format('YYYY-MM-DD');
@@ -222,24 +231,34 @@ const Conversation = ({ navigation, route }: ConversationType) => {
     } else {
       return moment(timestamp).format('MMM DD, YYYY');
     }
-  }
+  };
 
+  // render single chat bubble
   const renderChatBubble = ({ item }: { item: ConversationMessage }) => {
     const isSender = item.senderId === user.uuid;
+    if (!item.content) return null;
+
+    const senderName = isSender ? String.you : type === 'group' ? item.senderName : receiverData.userName;
+
     return (
       <View style={[styles.messageContainer, {
-        alignSelf: isSender ? 'flex-end' : 'flex-start'
+        alignSelf: isSender ? 'flex-end' : 'flex-start',
+        flexDirection: isSender ? 'row-reverse' : 'row',
       }]}>
-        {!isSender && <Image source={item.profilePicture ? { uri: item.profilePicture } : require('../../../assets/Images/user.jpg')} style={styles.userImage} />}
+        {!isSender && (
+          <Image
+            source={item.profilePicture ? { uri: item.profilePicture } : require('../../../assets/Images/user.jpg')}
+            style={styles.userImage}
+          />
+        )}
         <View>
-          <Text style={styles.senderName}>{isSender ? String.you : type === 'group' ? item.senderName : receiverData.userName}</Text>
+          <Text style={[styles.senderName, { alignSelf: isSender ? 'flex-end' : 'flex-start' }]}>{senderName}</Text>
           <View style={[styles.chatBubble, {
-            borderTopStartRadius: isSender ? 15 : 0, borderTopEndRadius: isSender ? 0 : 15,
+            borderTopStartRadius: isSender ? 15 : 0,
+            borderTopEndRadius: isSender ? 0 : 15,
             backgroundColor: isSender ? Colors.CHAT_BUBBLE : Colors.RECEIVER_CHAT_BUBBLE,
           }]}>
-            <Text style={[styles.message,
-            { color: isSender ? Colors.PRIMARY : Colors.DARK }]}>{item.content}
-            </Text>
+            <Text style={[styles.message, { color: isSender ? Colors.PRIMARY : Colors.DARK }]}>{item.content}</Text>
           </View>
           <Text style={styles.timestamp}>{moment(item.timestamp).format('hh:mm A')}</Text>
         </View>
@@ -259,7 +278,14 @@ const Conversation = ({ navigation, route }: ConversationType) => {
     <View style={styles.container}>
       <View style={styles.header}>
         <Icon name="arrow-back" size={24} color={Colors.DARK} style={styles.searchIcon} onPress={() => navigation.goBack()} />
-        <View style={styles.userContainer}>
+        <TouchableOpacity style={styles.userContainer} onPress={
+          type === 'group' ? () => navigation.navigate(Routes.GroupDetailes,
+            {
+              id,
+              groupImage: receiverData.profilePicture,
+              groupName: receiverData.groupName,
+            }) : () => { }
+        }>
           <Image source={receiverData.profilePicture ? { uri: receiverData.profilePicture } : require('../../../assets/Images/user.jpg')} style={styles.userImage} />
           <View>
             <Text style={styles.headerText}>{receiverData.userName ?
@@ -268,7 +294,7 @@ const Conversation = ({ navigation, route }: ConversationType) => {
             </Text>
             <Text style={styles.userStatus}>{String.activeNow}</Text>
           </View>
-        </View>
+        </TouchableOpacity>
         <View style={styles.headerRight}>
           <Icon name="call-outline" size={25} color={Colors.DARK} style={styles.searchIcon} />
           <Icon name="videocam-outline" size={25} color={Colors.DARK} style={styles.searchIcon} />
@@ -287,7 +313,6 @@ const Conversation = ({ navigation, route }: ConversationType) => {
                 data={conversations[item]}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={renderChatBubble}
-                inverted
               />
             </View>
           )}

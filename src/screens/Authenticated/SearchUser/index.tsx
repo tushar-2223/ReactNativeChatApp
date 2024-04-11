@@ -21,7 +21,6 @@ const SearchUser = ({ navigation }: SearchUserProps) => {
   const [userdata, setUserData] = useState<UserInfo[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<UserInfo[]>([]);
   const [loader, setLoader] = useState<boolean>(false);
-  const [groups, setGroups] = useState<any[]>([]);
   const userId = useSelector((state: any) => state.userReducer.userInfo.uuid);
 
   useEffect(() => {
@@ -52,6 +51,7 @@ const SearchUser = ({ navigation }: SearchUserProps) => {
     }
   };
 
+  //filter users by name
   const filterUsers = () => {
     const filtered = userdata.filter((user) => {
       return user.userName?.toLowerCase().includes(input.toLowerCase());
