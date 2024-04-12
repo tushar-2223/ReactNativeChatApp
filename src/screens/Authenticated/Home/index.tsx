@@ -137,9 +137,6 @@ const Home = ({ navigation }: HomeProps) => {
         </View>
         <View style={styles.chatTimeContainer}>
           <Text style={styles.chatTime}>{minAgo(item.timestamp)}</Text>
-          <View style={styles.chatNotification}>
-            <Text style={styles.notificationText}>2</Text>
-          </View>
         </View>
       </TouchableOpacity>
     )

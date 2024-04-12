@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
         width: width * 0.14,
         height: width * 0.14,
         borderRadius: 100,
-    },   
+    },
     userDetailed: {
         flex: 1,
         marginLeft: 10,
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     userName: {
         color: Colors.DARK,
         fontFamily: Fonts.medium,
-        fontSize: FontSize.fontXXLarge,
+        fontSize: FontSize.fontXLarge,
     },
     lastChat: {
         color: Colors.TEXT_LITE_GRAY,
@@ -124,6 +124,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        marginTop: height * 0.2
     },
     emptyText: {
         color: Colors.TEXT_LITE_GRAY,

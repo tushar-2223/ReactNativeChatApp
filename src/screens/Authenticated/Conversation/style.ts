@@ -121,6 +121,17 @@ const styles = StyleSheet.create({
         color: Colors.TEXT_LITE_GRAY,
         fontFamily: Fonts.medium,
         padding: 5,
+    },
+    emptyContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: height * 0.2
+    },
+    emptyText: {
+        color: Colors.TEXT_LITE_GRAY,
+        fontFamily: Fonts.regular,
+        fontSize: FontSize.fontXLarge,
     }
 })
 

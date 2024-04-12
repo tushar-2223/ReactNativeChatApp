@@ -59,6 +59,11 @@ const SearchUser = ({ navigation }: SearchUserProps) => {
     setFilteredUsers(filtered);
   }
 
+  const handleClose = () => {
+    setInput('');
+    navigation.goBack();
+  }
+
   const renderDetailed = ({ item }: any) => {
     return (
       <TouchableOpacity style={styles.userContainer} onPress={
@@ -86,7 +91,7 @@ const SearchUser = ({ navigation }: SearchUserProps) => {
             value={input}
             onChangeText={(text) => setInput(text)}
           />
-          <Icon name="close-outline" size={25} color={Colors.DARK} onPress={() => setInput('')} />
+          <Icon name="close-outline" size={25} color={Colors.DARK} onPress={handleClose} />
         </View>
         <AntDesign name="pluscircleo" size={25} color={Colors.DARK}
           onPress={() => navigation.navigate(Routes.Creategroup)}

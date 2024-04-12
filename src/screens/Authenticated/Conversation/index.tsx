@@ -237,7 +237,7 @@ const Conversation = ({ navigation, route }: ConversationType) => {
     const isSender = item.senderId === user.uuid;
     if (!item.content) return null;
 
-    const senderName = isSender ? String.you : type === 'group' ? item.senderName : receiverData.userName;
+    const senderName = !isSender ? type === 'group' ? item.senderName : receiverData.userName : '';
 
     return (
       <View style={[styles.messageContainer, {
@@ -310,7 +310,7 @@ const Conversation = ({ navigation, route }: ConversationType) => {
               {item !== '' && renderDayHeader(item)}
               <FlatList
                 data={conversations[item]}
-                keyExtractor={(item, index) => index.toString()}
+                keyExtractor={(_, index) => index.toString()}
                 renderItem={renderChatBubble}
               />
             </View>

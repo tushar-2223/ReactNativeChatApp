@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
         marginLeft: 10
     },
     userName: {
-        fontSize: FontSize.fontXXLarge,
+        fontSize: FontSize.fontXLarge,
         fontFamily:Fonts.medium,
         color: Colors.DARK
     },

@@ -39,8 +39,7 @@ const GroupDetailes = ({ navigation, route }: GroupDetailesProps) => {
 
   const renderChatItems = ({ item }: any) => {
     return (
-      <View style={styles.chatContainerBox}
-      >
+      <View style={styles.chatContainerBox}>
         <Image source={item.profilePicture ? { uri: item.profilePicture } : require('../../../assets/Images/user.jpg')
         } style={styles.chatUserImage} />
         <View style={styles.userInfo}>
@@ -78,12 +77,11 @@ const GroupDetailes = ({ navigation, route }: GroupDetailesProps) => {
         <Text style={styles.groupuserHeader}>{String.groupUsers}</Text>
         <FlatList
           data={groupUsers}
-          keyExtractor={(item, index) => index.toString()}
+          keyExtractor={(_, index) => index.toString()}
           renderItem={renderChatItems}
           ListEmptyComponent={emptyContainer}
         />
       </View>
-
     </AppBackground>
   )
 }

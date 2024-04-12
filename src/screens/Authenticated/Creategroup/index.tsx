@@ -13,6 +13,7 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage'
 import { Routes } from '../../../routes/Routes'
 import { UserInfo } from '../../../redux-toolkit/userSlice'
+import { useSelector } from 'react-redux'
 
 interface CreategroupProps {
     navigation: NativeStackNavigationProp<AuthenticatedNavigatorType>
@@ -28,9 +29,10 @@ interface Group {
 }
 
 const Creategroup = ({ navigation }: CreategroupProps) => {
+    const user = useSelector((state: any) => state.userReducer.userInfo);
     const [groupName, setGroupName] = useState<string>('');
     const [fetchUsers, setFetchUsers] = useState<UserInfo[]>([]);
-    const [groupSelectedUsers, setGroupSelectedUsers] = useState<string[]>([]);
+    const [groupSelectedUsers, setGroupSelectedUsers] = useState<string[]>([user.uuid]);
     const [profileImage, setProfileImage] = useState<string>('');
 
     useEffect(() => {
@@ -42,6 +44,7 @@ const Creategroup = ({ navigation }: CreategroupProps) => {
         ref.on('value', snapshot => {
             const data = snapshot.val();
             const users: UserInfo[] = [];
+            delete data[user.uuid];
             for (let key in data) {
                 users.push(data[key]);
             }
@@ -102,7 +105,7 @@ const Creategroup = ({ navigation }: CreategroupProps) => {
                 return;
             }
 
-            if (groupSelectedUsers.length < 1) {
+            if (groupSelectedUsers.length < 2) {
                 Toast.show({
                     type: 'error',
                     text1: String.selctedGroupMemebers,
@@ -180,15 +183,13 @@ const Creategroup = ({ navigation }: CreategroupProps) => {
             {header()}
             <ScrollView style={styles.groupContainer}>
                 <View style={styles.groupInputField}>
-                    <Text style={styles.groupDesc}>{String.groupDesc}</Text>
-                    <Text style={styles.groupSubLine}>{String.groupSubLine}</Text>
                     <View style={styles.profilePictureSelected}>
-                        <TouchableOpacity style={styles.pictureSelected}
+                        <TouchableOpacity
                             onPress={() => selectedprofileImage()}
                         >
                             <Image source={profileImage ? { uri: profileImage } : require('../../../assets/Images/user.jpg')} style={styles.profilePicture} />
                             <View style={styles.cameraIconContainer}>
-                                <Feather name="camera" size={20} color={Colors.DARK} style={styles.cameraIcon} />
+                                <Feather name="camera" size={20} color={Colors.DARK} />
                             </View>
                         </TouchableOpacity>
                     </View>
@@ -201,10 +202,16 @@ const Creategroup = ({ navigation }: CreategroupProps) => {
                     />
                 </View>
 
-                <View style={styles.groupUserContainer}>
-                    <Text style={styles.invitedMember}>{String.invitedMembers}</Text>
-                    {groupUserList()}
+
+                <Text style={styles.groupAdminText}>{String.groupAdmin}</Text>
+                <View style={styles.adminContainer}>
+                    <Image source={user.profilePicture ? { uri: user.profilePicture } : require('../../../assets/Images/user.jpg')} style={styles.adminImage} />
+                    <Text style={styles.adminName}>{user.userName}</Text>
                 </View>
+
+                <Text style={styles.invitedMember}>{String.invitedMembers}</Text>
+                {groupUserList()}
+
             </ScrollView>
 
             <View style={styles.createButton}>

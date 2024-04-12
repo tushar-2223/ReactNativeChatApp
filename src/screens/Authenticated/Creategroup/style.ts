@@ -53,15 +53,14 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         color: Colors.DARK,
         fontFamily: Fonts.medium,
-        backgroundColor: Colors.LITE_GRAY
-    },
-    groupUserContainer: {
+        borderBottomWidth: 1.5,
+        borderColor: Colors.LITE_GRAY
     },
     invitedMember: {
         fontSize: FontSize.fontLarge,
         fontFamily: Fonts.medium,
         color: Colors.TEXT_LITE_GRAY,
-        marginTop: height * 0.03
+        marginTop: height * 0.01
     },
     groupUserList: {
         flexDirection: 'row',
@@ -101,8 +100,6 @@ const styles = StyleSheet.create({
         borderRadius: 100,
         padding: 2
     },
-    cameraIcon: {
-    },
     profilePictureSelected: {
         position: 'relative',
         justifyContent: 'center',
@@ -115,9 +112,30 @@ const styles = StyleSheet.create({
         borderRadius: 100,
         margin: 5
     },
-    pictureSelected: {
-        
-    }
+    groupAdminText: {
+        fontSize: FontSize.fontLarge,
+        fontFamily: Fonts.medium,
+        color: Colors.TEXT_LITE_GRAY,
+        marginTop: height * 0.03
+    },
+    adminContainer: {
+        flexDirection: 'row',
+        marginVertical: 10
+    },
+    adminImage: {
+        width: width * 0.16,
+        height: width * 0.16,
+        borderRadius: 100,
+        margin: 5
+    },
+    adminName: {
+        fontSize: FontSize.fontXLarge,
+        fontFamily: Fonts.medium,
+        color: Colors.DARK,
+        marginLeft: 5,
+        marginTop: 10
+    },
+    
 })
 
 export default styles;
