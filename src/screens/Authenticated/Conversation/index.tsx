@@ -113,14 +113,9 @@ const Conversation = ({navigation, route}: ConversationType) => {
             const message = snapshotData[key];
             const day = getDay(message.timestamp);
             messages[day] = messages[day] || [];
-            messages[day].push({
-              content: message.content,
-              senderId: message.senderId,
-              receiverId: message.receiverId,
-              timestamp: message.timestamp,
-              senderName: message.senderName,
-              profilePicture: message.profilePicture,
-            });
+            messages[day].push(message);
+
+            console.log('messages:', messages);
             //sort messages by timestamp
             messages[day].sort(
               (a, b) =>

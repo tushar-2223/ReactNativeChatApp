@@ -42,6 +42,7 @@ export const String = {
     editProfile: 'Edit Profile',
     groupUsers: 'Group Users',
     groupAdmin: 'Group Admin',
+    justNow: 'Just now',
 
     logInSuccess: 'Log in successfully',
     emailRequired: 'Email is required',
