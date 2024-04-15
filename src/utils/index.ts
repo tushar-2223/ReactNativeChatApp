@@ -19,20 +19,6 @@ const minAgo = (date: Date) => {
     } else {
         return `${Math.floor(diff / 86400000)} d ago`;
     }
-
-    // const time = moment(date).format('YYYY-MM-DD HH:mm:ss');
-    // const now = moment().format('YYYY-MM-DD HH:mm:ss');
-    // const diff = moment(now).diff(moment(time));
-
-    // if (diff < 60000) {
-    //     return String.justNow;
-    // } else if (diff < 3600000) {
-    //     return `${Math.floor(diff / 60000)} min ago`;
-    // } else if (diff < 86400000) {
-    //     return `${Math.floor(diff / 3600000)} h ago`;
-    // } else {
-    //     return `${Math.floor(diff / 86400000)} d ago`;
-    // }
 }
 
 export {

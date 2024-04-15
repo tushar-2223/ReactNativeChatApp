@@ -213,7 +213,7 @@ const Home = ({navigation}: HomeProps) => {
         <View style={styles.statusContainer}>
           <FlatList
             data={storyData}
-            keyExtractor={(item, index) => index.toString()}
+            keyExtractor={(_, index) => index.toString()}
             horizontal
             showsHorizontalScrollIndicator={false}
             renderItem={renderStoryItems}
@@ -225,7 +225,7 @@ const Home = ({navigation}: HomeProps) => {
 
           <FlatList
             data={Object.values(chatData)}
-            keyExtractor={(item, index) => index.toString()}
+            keyExtractor={(_, index) => index.toString()}
             renderItem={renderChatItems}
             ListEmptyComponent={emptyContainer}
           />
