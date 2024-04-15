@@ -8,6 +8,7 @@ import {UserInfo} from '../../../redux-toolkit/userSlice';
 import AppBackground from '../../../components/view/AppBackground';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {Colors, String} from '../../../utils';
+import { useSelector } from 'react-redux';
 
 type GroupDetailesProps = NativeStackScreenProps<
   AuthenticatedNavigatorType,
@@ -17,6 +18,7 @@ type GroupDetailesProps = NativeStackScreenProps<
 const GroupDetailes = ({navigation, route}: GroupDetailesProps) => {
   const {id, groupImage, groupName} = route.params;
   const [groupUsers, setGroupUsers] = useState<UserInfo[]>([]);
+  const user = useSelector((state: any) => state.userReducer.userInfo);
 
   useEffect(() => {
     fetchGroupUsers();
@@ -25,7 +27,7 @@ const GroupDetailes = ({navigation, route}: GroupDetailesProps) => {
   const fetchGroupUsers = async () => {
     try {
       const usersIds = (
-        await database().ref(`conversations/${id}/allUsers`).once('value')
+        await database().ref(`users/${user.uuid}/conversation/${id}/allUsers`).once('value')
       ).val();
       let users: UserInfo[] = [];
 

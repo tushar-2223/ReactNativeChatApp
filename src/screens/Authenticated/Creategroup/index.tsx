@@ -33,6 +33,7 @@ interface Group {
   conversationKey: string | null;
   type: string;
   timestamp: string;
+  allUsers: string[];
 }
 
 const Creategroup = ({navigation}: CreategroupProps) => {
@@ -124,11 +125,16 @@ const Creategroup = ({navigation}: CreategroupProps) => {
       }
 
       const ref = database().ref('conversations');
-      const newConversation = ref.push({
-        groupName: groupName,
-        allUsers: groupSelectedUsers,
-      });
-      const conversationKey = newConversation.key;
+
+      //old logic
+
+      // const newConversation = ref.push({
+      //   groupName: groupName,
+      //   allUsers: groupSelectedUsers,
+      // });
+      // const conversationKey = newConversation.key;
+      
+      const conversationKey = ref.push().key;
 
       if (!conversationKey) {
         return;
@@ -141,6 +147,7 @@ const Creategroup = ({navigation}: CreategroupProps) => {
         conversationKey: conversationKey,
         type: 'group',
         timestamp: new Date().toISOString(),
+        allUsers: groupSelectedUsers,
       };
 
       groupSelectedUsers.map(async uuid => {

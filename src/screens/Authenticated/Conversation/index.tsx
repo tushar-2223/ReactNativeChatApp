@@ -74,7 +74,7 @@ const Conversation = ({navigation, route}: ConversationType) => {
   //fetch group selected users
   const fetchSelectedUsers = async () => {
     try {
-      const conversationRef = database().ref(`conversations/${id}/allUsers`);
+      const conversationRef = database().ref(`users/${user.uuid}/conversation/${id}/allUsers`);
       const snapshot = await conversationRef.once('value');
 
       if (snapshot.exists()) {
