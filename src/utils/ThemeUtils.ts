@@ -28,4 +28,4 @@ const FontSize = {
     fontXXLarge: 20,
 };
 
-export {Fonts,FontSize}
+export { Fonts, FontSize }

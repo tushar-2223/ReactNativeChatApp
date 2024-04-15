@@ -1,16 +1,26 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, FlatList, Image, TouchableOpacity } from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  FlatList,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import Icon from 'react-native-vector-icons/Ionicons';
 import moment from 'moment';
-import { useSelector } from 'react-redux';
-import { Colors, String } from '../../../utils';
+import {useSelector} from 'react-redux';
+import {Colors, String} from '../../../utils';
 import database from '@react-native-firebase/database';
 import styles from './style';
-import { AuthenticatedNavigatorType } from '../../../routes/Authenticated';
-import { Routes } from '../../../routes/Routes';
+import {AuthenticatedNavigatorType} from '../../../routes/Authenticated';
+import {Routes} from '../../../routes/Routes';
 
-type ConversationType = NativeStackScreenProps<AuthenticatedNavigatorType, 'Conversation'>;
+type ConversationType = NativeStackScreenProps<
+  AuthenticatedNavigatorType,
+  'Conversation'
+>;
 
 interface ConversationMessage {
   content?: string;
@@ -22,13 +32,17 @@ interface ConversationMessage {
   profilePicture?: string;
 }
 
-const Conversation = ({ navigation, route }: ConversationType) => {
-  const { id, type } = route.params;
+const Conversation = ({navigation, route}: ConversationType) => {
+  const {id, type} = route.params;
   const user = useSelector((state: any) => state.userReducer.userInfo);
   const [input, setInput] = useState<string>('');
-  const [conversations, setConversations] = useState<Record<string, ConversationMessage[]>>({});
+  const [conversations, setConversations] = useState<
+    Record<string, ConversationMessage[]>
+  >({});
   const [receiverData, setReceiverData] = useState<any>({}); // Users | Group Details
-  const [fetchGroupSelectedUsers, setFetchGroupSelectedUsers] = useState<string[]>([]);
+  const [fetchGroupSelectedUsers, setFetchGroupSelectedUsers] = useState<
+    string[]
+  >([]);
 
   useEffect(() => {
     fetchConversations();
@@ -75,15 +89,22 @@ const Conversation = ({ navigation, route }: ConversationType) => {
   //fetch conversations from database and set in state (Single and Group Chat)
   const fetchConversations = async () => {
     try {
-      const receiverRef = database().ref(`users/${id}/conversation/${user.uuid}`);
+      const receiverRef = database().ref(
+        `users/${id}/conversation/${user.uuid}`,
+      );
       const senderRef = database().ref(`users/${user.uuid}/conversation/${id}`);
-      const [receiverSnapshot, senderSnapshot] = await Promise.all([receiverRef.once('value'), senderRef.once('value')]);
+      const [receiverSnapshot, senderSnapshot] = await Promise.all([
+        receiverRef.once('value'),
+        senderRef.once('value'),
+      ]);
 
       if (receiverSnapshot.exists() || senderSnapshot.exists()) {
         const conversationKey = senderSnapshot.val().conversationKey;
-        const conversationRef = database().ref(`conversations/${conversationKey}`).orderByChild('timestamp');
+        const conversationRef = database()
+          .ref(`conversations/${conversationKey}`)
+          .orderByChild('timestamp');
 
-        conversationRef.on('value', (snapshot) => {
+        conversationRef.on('value', snapshot => {
           const snapshotData = snapshot.val();
           const messages: Record<string, ConversationMessage[]> = {};
 
@@ -101,7 +122,11 @@ const Conversation = ({ navigation, route }: ConversationType) => {
               profilePicture: message.profilePicture,
             });
             //sort messages by timestamp
-            messages[day].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+            messages[day].sort(
+              (a, b) =>
+                new Date(a.timestamp).getTime() -
+                new Date(b.timestamp).getTime(),
+            );
           }
           setConversations(messages);
         });
@@ -137,20 +162,28 @@ const Conversation = ({ navigation, route }: ConversationType) => {
 
       //for group chat (update all users in group chat with new message)
       if (type === 'group') {
-        const groupRef = database().ref(`users/${user.uuid}/conversation/${id}`);
+        const groupRef = database().ref(
+          `users/${user.uuid}/conversation/${id}`,
+        );
         const groupSnapshot = await groupRef.once('value');
 
         if (groupSnapshot.exists()) {
           const conversationKey = groupSnapshot.val().conversationKey;
-          const conversationRef = database().ref(`conversations/${conversationKey}`);
+          const conversationRef = database().ref(
+            `conversations/${conversationKey}`,
+          );
 
-          await Promise.all(fetchGroupSelectedUsers.map(async (uuid) => {
-            const userRef = database().ref(`users/${uuid}/conversation/${id}`);
-            await userRef.update({
-              content: input,
-              timestamp: new Date().toISOString(),
-            });
-          }));
+          await Promise.all(
+            fetchGroupSelectedUsers.map(async uuid => {
+              const userRef = database().ref(
+                `users/${uuid}/conversation/${id}`,
+              );
+              await userRef.update({
+                content: input,
+                timestamp: new Date().toISOString(),
+              });
+            }),
+          );
 
           await conversationRef.push().set(groupMessage);
 
@@ -160,9 +193,14 @@ const Conversation = ({ navigation, route }: ConversationType) => {
         }
       }
 
-      const receiverRef = database().ref(`users/${id}/conversation/${user.uuid}`);
+      const receiverRef = database().ref(
+        `users/${id}/conversation/${user.uuid}`,
+      );
       const senderRef = database().ref(`users/${user.uuid}/conversation/${id}`);
-      const [receiverSnapshot, senderSnapshot] = await Promise.all([receiverRef.once('value'), senderRef.once('value')]);
+      const [receiverSnapshot, senderSnapshot] = await Promise.all([
+        receiverRef.once('value'),
+        senderRef.once('value'),
+      ]);
 
       let conversationKey: any = '';
 
@@ -189,7 +227,9 @@ const Conversation = ({ navigation, route }: ConversationType) => {
       }
 
       //send message receiver and sender
-      const conversationRef = database().ref(`conversations/${conversationKey}`);
+      const conversationRef = database().ref(
+        `conversations/${conversationKey}`,
+      );
       await Promise.all([
         database().ref(`users/${id}/conversation/${user.uuid}`).update({
           content: input,
@@ -197,7 +237,7 @@ const Conversation = ({ navigation, route }: ConversationType) => {
           conversationKey,
           receiverId: user.uuid,
           userName: user.userName,
-          profilePicture: user.profilePicture
+          profilePicture: user.profilePicture,
         }),
         database().ref(`users/${user.uuid}/conversation/${id}`).update({
           content: input,
@@ -205,7 +245,7 @@ const Conversation = ({ navigation, route }: ConversationType) => {
           conversationKey,
           receiverId: id,
           userName: receiverData.userName,
-          profilePicture: receiverData.profilePicture
+          profilePicture: receiverData.profilePicture,
         }),
         conversationRef.push().set(newMessage),
       ]);
@@ -233,33 +273,67 @@ const Conversation = ({ navigation, route }: ConversationType) => {
   };
 
   // render single chat bubble
-  const renderChatBubble = ({ item }: { item: ConversationMessage }) => {
+  const renderChatBubble = ({item}: {item: ConversationMessage}) => {
     const isSender = item.senderId === user.uuid;
     if (!item.content) return null;
 
-    const senderName = !isSender ? type === 'group' ? item.senderName : receiverData.userName : '';
+    const senderName = !isSender
+      ? type === 'group'
+        ? item.senderName
+        : receiverData.userName
+      : null;
 
     return (
-      <View style={[styles.messageContainer, {
-        alignSelf: isSender ? 'flex-end' : 'flex-start',
-        flexDirection: isSender ? 'row-reverse' : 'row',
-      }]}>
-        {!isSender && (
+      <View
+        style={[
+          styles.messageContainer,
+          {
+            alignSelf: isSender ? 'flex-end' : 'flex-start',
+            flexDirection: isSender ? 'row-reverse' : 'row',
+          },
+        ]}>
+        {!isSender ? (
           <Image
-            source={item.profilePicture ? { uri: item.profilePicture } : require('../../../assets/Images/user.jpg')}
+            source={
+              item.profilePicture
+                ? {uri: item.profilePicture}
+                : require('../../../assets/Images/user.jpg')
+            }
             style={styles.userImage}
           />
-        )}
+        ) : null}
         <View>
-          <Text style={[styles.senderName, { alignSelf: isSender ? 'flex-end' : 'flex-start' }]}>{senderName}</Text>
-          <View style={[styles.chatBubble, {
-            borderTopStartRadius: isSender ? 15 : 0,
-            borderTopEndRadius: isSender ? 0 : 15,
-            backgroundColor: isSender ? Colors.CHAT_BUBBLE : Colors.RECEIVER_CHAT_BUBBLE,
-          }]}>
-            <Text style={[styles.message, { color: isSender ? Colors.PRIMARY : Colors.DARK }]}>{item.content}</Text>
+          {!isSender ? (
+            <Text
+              style={[
+                styles.senderName,
+                {alignSelf: isSender ? 'flex-end' : 'flex-start'},
+              ]}>
+              {senderName}
+            </Text>
+          ) : null}
+          <View
+            style={[
+              styles.chatBubble,
+              {
+                borderTopStartRadius: isSender ? 15 : 0,
+                borderTopEndRadius: isSender ? 0 : 15,
+                backgroundColor: isSender
+                  ? Colors.CHAT_BUBBLE
+                  : Colors.RECEIVER_CHAT_BUBBLE,
+              },
+            ]}>
+            <Text
+              style={[
+                styles.message,
+                {color: isSender ? Colors.PRIMARY : Colors.DARK},
+              ]}>
+              {item.content}
+            </Text>
           </View>
-          <Text style={styles.timestamp}>{moment(item.timestamp).format('hh:mm A')}</Text>
+          <Text style={styles.timestamp}>
+            {moment(item.timestamp).format('hh:mm A')}
+          </Text>
         </View>
       </View>
     );
@@ -276,27 +350,55 @@ const Conversation = ({ navigation, route }: ConversationType) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Icon name="arrow-back" size={24} color={Colors.DARK} style={styles.searchIcon} onPress={() => navigation.goBack()} />
-        <TouchableOpacity style={styles.userContainer} onPress={
-          type === 'group' ? () => navigation.navigate(Routes.GroupDetailes,
-            {
-              id,
-              groupImage: receiverData.profilePicture,
-              groupName: receiverData.groupName,
-            }) : () => { }
-        }>
-          <Image source={receiverData.profilePicture ? { uri: receiverData.profilePicture } : require('../../../assets/Images/user.jpg')} style={styles.userImage} />
-          <View>
-            <Text style={styles.headerText}>{receiverData.userName ?
-              receiverData.userName : receiverData.groupName
+        <Icon
+          name="arrow-back"
+          size={24}
+          color={Colors.DARK}
+          style={styles.searchIcon}
+          onPress={() => navigation.goBack()}
+        />
+        <TouchableOpacity
+          style={styles.userContainer}
+          onPress={
+            type === 'group'
+              ? () =>
+                  navigation.navigate(Routes.GroupDetailes, {
+                    id,
+                    groupImage: receiverData.profilePicture,
+                    groupName: receiverData.groupName,
+                  })
+              : () => {}
+          }>
+          <Image
+            source={
+              receiverData.profilePicture
+                ? {uri: receiverData.profilePicture}
+                : require('../../../assets/Images/user.jpg')
             }
+            style={styles.userImage}
+          />
+          <View>
+            <Text style={styles.headerText}>
+              {receiverData.userName
+                ? receiverData.userName
+                : receiverData.groupName}
             </Text>
             <Text style={styles.userStatus}>{String.activeNow}</Text>
           </View>
         </TouchableOpacity>
         <View style={styles.headerRight}>
-          <Icon name="call-outline" size={25} color={Colors.DARK} style={styles.searchIcon} />
-          <Icon name="videocam-outline" size={25} color={Colors.DARK} style={styles.searchIcon} />
+          <Icon
+            name="call-outline"
+            size={25}
+            color={Colors.DARK}
+            style={styles.searchIcon}
+          />
+          <Icon
+            name="videocam-outline"
+            size={25}
+            color={Colors.DARK}
+            style={styles.searchIcon}
+          />
         </View>
       </View>
 
@@ -304,8 +406,8 @@ const Conversation = ({ navigation, route }: ConversationType) => {
         <FlatList
           data={Object.keys(conversations)}
           showsVerticalScrollIndicator={false}
-          keyExtractor={(item) => item}
-          renderItem={({ item }) => (
+          keyExtractor={item => item}
+          renderItem={({item}) => (
             <View>
               {item !== '' && renderDayHeader(item)}
               <FlatList
@@ -321,7 +423,12 @@ const Conversation = ({ navigation, route }: ConversationType) => {
 
       <View style={styles.inputContainer}>
         <View style={styles.inputField}>
-          <Icon name="attach" size={26} color={Colors.TEXT_LITE_GRAY} style={styles.attachIcon} />
+          <Icon
+            name="attach"
+            size={26}
+            color={Colors.TEXT_LITE_GRAY}
+            style={styles.attachIcon}
+          />
           <TextInput
             style={styles.input}
             placeholder={String.typeMessage}
@@ -330,10 +437,7 @@ const Conversation = ({ navigation, route }: ConversationType) => {
             onChangeText={setInput}
           />
         </View>
-        <TouchableOpacity
-          onPress={sendMessage}
-          style={styles.sendButton}
-        >
+        <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
           <Icon name="send" size={23} color={Colors.CHAT_BUBBLE} />
         </TouchableOpacity>
       </View>

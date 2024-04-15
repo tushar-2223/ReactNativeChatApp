@@ -13,34 +13,34 @@ const REGEX = {
 const storyData = [
     {
         id: 1,
-        profilePicture:'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-        borderColor:'#FFC746',
+        profilePicture: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        borderColor: '#FFC746',
         userName: 'Adil'
     },
     {
         id: 2,
-        profilePicture:'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-        borderColor:'#EDA0A8',
+        profilePicture: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+        borderColor: '#EDA0A8',
         userName: 'Marina'
     },
     {
         id: 3,
         profilePicture: 'https://media.istockphoto.com/id/1386479313/photo/happy-millennial-afro-american-business-woman-posing-isolated-on-white.webp?b=1&s=170667a&w=0&k=20&c=ahypUC_KTc95VOsBkzLFZiCQ0VJwewfrSV43BOrLETM=',
-        borderColor:'#98A1F1',
+        borderColor: '#98A1F1',
         userName: 'Dean'
     },
     {
         id: 4,
         profilePicture: 'https://media.istockphoto.com/id/1317804578/photo/one-businesswoman-headshot-smiling-at-the-camera.webp?b=1&s=170667a&w=0&k=20&c=cVdVl-0bpliZ0Sduc7ZDkMPwLnbxaMXZONllS39oeFc=',
-        borderColor:'#00FF00',
+        borderColor: '#00FF00',
         userName: 'Max'
     },
     {
         id: 5,
         profilePicture: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-        borderColor:'#FFC746',
+        borderColor: '#FFC746',
         userName: 'Virat'
     }
 ];
 
-export { width, height, REGEX ,GOOGLE_WEB_API_KEY ,storyData}
+export { width, height, REGEX, GOOGLE_WEB_API_KEY, storyData }

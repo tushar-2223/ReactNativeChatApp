@@ -1,21 +1,20 @@
-import { View, Text, TouchableOpacity } from 'react-native'
-import React from 'react'
-import LinearGradient from 'react-native-linear-gradient'
-import styles from './style'
-import { Colors, Fonts } from '../../../utils'
+import {Text, TouchableOpacity} from 'react-native';
+import React from 'react';
+import LinearGradient from 'react-native-linear-gradient';
+import styles from './style';
+import {Colors, Fonts} from '../../../utils';
 
 interface Props {
-  title: string,
-  onPress?: () => void
-  gradient?: string[],
-  textColor?: string,
-  fontFamily?: string,
-  mb?: number,
-  mt?: number,
+  title: string;
+  onPress?: () => void;
+  gradient?: string[];
+  textColor?: string;
+  fontFamily?: string;
+  mb?: number;
+  mt?: number;
 }
 
 const CustomButton = (props: Props) => {
-
   const {
     title,
     onPress,
@@ -24,23 +23,21 @@ const CustomButton = (props: Props) => {
     fontFamily = Fonts.bold,
     mb = 0,
     mt = 0,
-  } = props
+  } = props;
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.7}
-      onPress={onPress}
-    >
+    <TouchableOpacity activeOpacity={0.7} onPress={onPress}>
       <LinearGradient
         colors={gradient}
-        start={{ x: 0, y: 0.5 }}
-        end={{ x: 1, y: 0.5 }}
-        style={[styles.button,{ marginBottom: mb, marginTop: mt }]}
-      >
-        <Text style={[styles.text, { color: textColor, fontFamily: fontFamily }]}>{title}</Text>
+        start={{x: 0, y: 0.5}}
+        end={{x: 1, y: 0.5}}
+        style={[styles.button, {marginBottom: mb, marginTop: mt}]}>
+        <Text style={[styles.text, {color: textColor, fontFamily: fontFamily}]}>
+          {title}
+        </Text>
       </LinearGradient>
     </TouchableOpacity>
-  )
-}
+  );
+};
 
-export default CustomButton
+export default CustomButton;

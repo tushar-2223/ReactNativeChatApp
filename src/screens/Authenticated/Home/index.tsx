@@ -1,4 +1,4 @@
-import { View, Text, Image, FlatList, TouchableOpacity, BackHandler, VirtualizedList } from 'react-native'
+import { View, Text, Image, FlatList, TouchableOpacity, BackHandler } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import styles from './style'
 import { Routes } from '../../../routes/Routes'
@@ -13,7 +13,6 @@ import CustomLoader from '../../../components/view/CustomLoader'
 import CustomModal from '../../../components/view/CustomModal'
 import { ModalType } from '../../../components/view/CustomModal'
 import { useIsFocused } from '@react-navigation/native'
-import { UserInfo } from '../../../redux-toolkit/userSlice'
 
 interface HomeProps {
   navigation: NativeStackNavigationProp<AuthenticatedNavigatorType>
