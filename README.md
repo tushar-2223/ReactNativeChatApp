@@ -1,3 +1,3 @@
-##Link
+## Figma Design Link:
 
-https://www.figma.com/file/cYDtTi1pkLcfwuayhX6cOg/TEXTit-Chatting-App---Chatbox-(Community)?type=design&node-id=0-1&mode=design&t=hH5HK64HfBdkOblf-0
+https://www.figma.com/community/file/1276850660385543771/textit-chatting-app-chatbox
